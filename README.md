@@ -4,12 +4,13 @@
 
 ## Features
 
+- [ ] Grouping
+- [ ] Intelli-routing
+- [ ] Load balancing
+- [ ] Semantic cache
 - [ ] Structured data
 - [ ] Function calling
 - [ ] Instruction mapping
-- [ ] Load balancing
-- [ ] Grouping
-- [ ] Intelli-routing
 - [ ] Generative streaming
 - [ ] Advanced tracing
 - [ ] Inference tracking
@@ -256,3 +257,22 @@ var (
     client package.Client
 )
 ```
+
+## Acknowledgement
+
+- Heavily inspired by [Portkey.ai](https://portkey.ai/)
+- Heavily inspired by [AI Gateway - LLM API Solution | Kong Inc.](https://konghq.com/products/kong-ai-gateway)
+- Heavily inspired by [Unify: The Best LLM on Every Prompt](https://unify.ai/)
+- [lm-sys/RouteLLM: A framework for serving and evaluating LLM routers - save LLM costs without compromising quality!](https://github.com/lm-sys/RouteLLM)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=lingticio/llmg&type=Date)](https://star-history.com/#lingticio/llmg&Date)
+
+## Contributors
+
+Thanks to everyone who contributed to the this project!
+
+[![contributors](https://contrib.rocks/image?repo=lingticio/llmg)](https://github.com/lingticio/llmg/graphs/contributors)
+
+### Written with ♥
