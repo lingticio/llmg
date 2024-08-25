@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/lingticio/gateway/pkg/apierrors"
+	"github.com/lingticio/llmg/pkg/apierrors"
 	"github.com/nekomeowww/fo"
 	"google.golang.org/grpc/metadata"
 )

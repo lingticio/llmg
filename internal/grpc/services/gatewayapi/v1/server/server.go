@@ -3,8 +3,8 @@ package serverv1
 import (
 	"context"
 
-	gatewayapiv1 "github.com/lingticio/gateway/apis/gatewayapi/v1"
-	"github.com/lingticio/gateway/internal/meta"
+	gatewayapiv1 "github.com/lingticio/llmg/apis/gatewayapi/v1"
+	"github.com/lingticio/llmg/internal/meta"
 )
 
 type ServerService struct {

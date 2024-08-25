@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/lingticio/gateway/pkg/apierrors"
+	"github.com/lingticio/llmg/pkg/apierrors"
 	"google.golang.org/grpc/metadata"
 )
 

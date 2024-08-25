@@ -12,8 +12,8 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/lingticio/gateway/internal/configs"
-	"github.com/lingticio/gateway/internal/meta"
+	"github.com/lingticio/llmg/internal/configs"
+	"github.com/lingticio/llmg/internal/meta"
 )
 
 func NewLogger() func(config *configs.Config) (*logger.Logger, error) {

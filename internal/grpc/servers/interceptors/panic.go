@@ -4,7 +4,7 @@ import (
 	"context"
 	"runtime/debug"
 
-	"github.com/lingticio/gateway/pkg/apierrors"
+	"github.com/lingticio/llmg/pkg/apierrors"
 	"github.com/nekomeowww/xo/logger"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"

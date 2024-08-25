@@ -1,8 +1,8 @@
 package configs
 
 import (
-	"github.com/lingticio/gateway/internal/meta"
-	"github.com/lingticio/gateway/pkg/utils"
+	"github.com/lingticio/llmg/internal/meta"
+	"github.com/lingticio/llmg/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 )

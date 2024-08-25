@@ -3,7 +3,7 @@ package resolvers
 import (
 	"encoding/json"
 
-	"github.com/lingticio/gateway/internal/graph/openai/model"
+	"github.com/lingticio/llmg/internal/graph/openai/model"
 	"github.com/nekomeowww/fo"
 	"github.com/samber/lo"
 	"github.com/sashabaranov/go-openai"

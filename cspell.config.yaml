@@ -14,6 +14,7 @@ words:
   - gatewayapi
   - gatewayapiv
   - googleapis
+  - gqlerror
   - gqlgen
   - grpcpkg
   - grpcservers
@@ -23,12 +24,14 @@ words:
   - labstack
   - lingtic
   - lingticio
+  - llmg
   - managementapi
   - managementapiv1
   - modelv1
   - nekomeowww
   - Nillable
   - nolint
+  - openai
   - openapi
   - openapiv2
   - openapiv3
@@ -38,9 +41,11 @@ words:
   - Rueidis
   - rueidisstore
   - samber
+  - sashabaranov
   - serverv1
   - Supabase
   - thumbhash
+  - vektah
   - wellknowntypes
 ignoreWords: []
 import:

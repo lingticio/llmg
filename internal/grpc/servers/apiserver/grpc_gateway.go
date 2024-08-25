@@ -17,10 +17,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/lingticio/gateway/internal/configs"
-	"github.com/lingticio/gateway/internal/grpc/servers/interceptors"
-	"github.com/lingticio/gateway/internal/grpc/servers/middlewares"
-	grpcpkg "github.com/lingticio/gateway/pkg/grpc"
+	"github.com/lingticio/llmg/internal/configs"
+	"github.com/lingticio/llmg/internal/grpc/servers/interceptors"
+	"github.com/lingticio/llmg/internal/grpc/servers/middlewares"
+	grpcpkg "github.com/lingticio/llmg/pkg/grpc"
 )
 
 type NewGatewayServerParams struct {
@@ -67,11 +67,11 @@ func NewGatewayServer() func(params NewGatewayServerParams) (*GatewayServer, err
 		}
 
 		server := &GatewayServer{
-			ListenAddr:     params.Config.LingticIo.Gateway.Http.Addr,
-			GRPCServerAddr: params.Config.LingticIo.Gateway.Grpc.Addr,
+			ListenAddr:     params.Config.LingticIo.LLMG.Http.Addr,
+			GRPCServerAddr: params.Config.LingticIo.LLMG.Grpc.Addr,
 			echo:           e,
 			server: &http.Server{
-				Addr:              params.Config.LingticIo.Gateway.Http.Addr,
+				Addr:              params.Config.LingticIo.LLMG.Http.Addr,
 				Handler:           e,
 				ReadHeaderTimeout: time.Duration(30) * time.Second,
 			},
@@ -79,7 +79,7 @@ func NewGatewayServer() func(params NewGatewayServerParams) (*GatewayServer, err
 
 		params.Lifecycle.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
-				conn, err := grpc.NewClient(params.Config.LingticIo.Gateway.Grpc.Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+				conn, err := grpc.NewClient(params.Config.LingticIo.LLMG.Grpc.Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 				if err != nil {
 					return err
 				}

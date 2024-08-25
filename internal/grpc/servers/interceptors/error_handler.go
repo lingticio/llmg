@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/lingticio/gateway/apis/jsonapi"
-	"github.com/lingticio/gateway/pkg/apierrors"
+	"github.com/lingticio/llmg/apis/jsonapi"
+	"github.com/lingticio/llmg/pkg/apierrors"
 	"github.com/nekomeowww/xo/logger"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"

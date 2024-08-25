@@ -1,4 +1,4 @@
-module github.com/lingticio/gateway
+module github.com/lingticio/llmg
 
 go 1.22.2
 

@@ -51,7 +51,7 @@ type ChatCompletionChoice {
   """
   Log probability information for the choice.
   """
-  logprobs: LogProbs
+  logProbs: LogProbs
 }
 
 union ChatCompletionMessageContent = ChatCompletionTextContent | ChatCompletionArrayContent
@@ -271,7 +271,7 @@ type TokenLogProb {
   """
   bytes: [Int!]!
   """
-  List of the most likely tokens and their log probability, at this token position. In rare cases, there may be fewer than the number of requested `top_logprobs` returned.
+  List of the most likely tokens and their log probability, at this token position. In rare cases, there may be fewer than the number of requested `topLogProbs` returned.
   """
   topLogProbs: [TopLogProb!]!
 }
@@ -461,7 +461,7 @@ input CreateChatCompletionInput {
   """
   An integer between 0 and 20 specifying the number of most likely tokens to
   return at each token position, each with an associated log probability.
-  `logprobs` must be set to `true` if this parameter is used.
+  `logProbs` must be set to `true` if this parameter is used.
   """
   topLogProbs: Int
   """

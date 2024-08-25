@@ -1,7 +1,7 @@
 package servers
 
 import (
-	"github.com/lingticio/gateway/internal/grpc/servers/apiserver"
+	"github.com/lingticio/llmg/internal/grpc/servers/apiserver"
 	"go.uber.org/fx"
 )
 

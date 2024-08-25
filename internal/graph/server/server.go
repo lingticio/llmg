@@ -9,9 +9,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/lingticio/gateway/internal/configs"
-	"github.com/lingticio/gateway/internal/graph/openai"
-	"github.com/lingticio/gateway/internal/graph/server/middlewares"
+	"github.com/lingticio/llmg/internal/configs"
+	"github.com/lingticio/llmg/internal/graph/openai"
+	"github.com/lingticio/llmg/internal/graph/server/middlewares"
 	"github.com/nekomeowww/xo/logger"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -61,7 +61,7 @@ func NewServer() func(params NewServerParams) *Server {
 		}
 
 		server := &http.Server{
-			Addr:              params.Config.LingticIo.Gateway.GraphQL.Addr,
+			Addr:              params.Config.LingticIo.LLMG.GraphQL.Addr,
 			Handler:           e,
 			ReadHeaderTimeout: time.Minute,
 		}

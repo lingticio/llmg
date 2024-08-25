@@ -7,12 +7,10 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/lingticio/gateway/internal/configs"
-	"github.com/lingticio/gateway/internal/datastore"
-	grpcservers "github.com/lingticio/gateway/internal/grpc/servers"
-	apiserver "github.com/lingticio/gateway/internal/grpc/servers/apiserver"
-	grpcservices "github.com/lingticio/gateway/internal/grpc/services"
-	"github.com/lingticio/gateway/internal/libs"
+	"github.com/lingticio/llmg/internal/configs"
+	"github.com/lingticio/llmg/internal/datastore"
+	"github.com/lingticio/llmg/internal/graph/server"
+	"github.com/lingticio/llmg/internal/libs"
 	"github.com/spf13/cobra"
 )
 
@@ -23,16 +21,14 @@ var (
 
 func main() {
 	root := &cobra.Command{
-		Use: "gateway-grpc",
+		Use: "llmg-graphql",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			app := fx.New(
-				fx.Provide(configs.NewConfig("lingticio", "gateway", configFilePath, envFilePath)),
+				fx.Provide(configs.NewConfig("lingticio", "llmg", configFilePath, envFilePath)),
 				fx.Options(libs.Modules()),
 				fx.Options(datastore.Modules()),
-				fx.Options(grpcservers.Modules()),
-				fx.Options(grpcservices.Modules()),
-				fx.Invoke(apiserver.RunGRPCServer()),
-				fx.Invoke(apiserver.RunGatewayServer()),
+				fx.Options(server.Modules()),
+				fx.Invoke(server.Run()),
 			)
 
 			app.Run()

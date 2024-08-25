@@ -5,7 +5,7 @@ package apis.gatewayapi.v1;
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-option go_package = "github.com/lingticio/gateway/apis/gatewayapi/v1";
+option go_package = "github.com/lingticio/llmg/apis/gatewayapi/v1";
 
 message ReleaseRequest {}
 

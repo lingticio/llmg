@@ -4,9 +4,9 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/grpc/reflection"
 
-	gatewayapiv1 "github.com/lingticio/gateway/apis/gatewayapi/v1"
-	serverv1 "github.com/lingticio/gateway/internal/grpc/services/gatewayapi/v1/server"
-	grpcpkg "github.com/lingticio/gateway/pkg/grpc"
+	gatewayapiv1 "github.com/lingticio/llmg/apis/gatewayapi/v1"
+	serverv1 "github.com/lingticio/llmg/internal/grpc/services/gatewayapi/v1/server"
+	grpcpkg "github.com/lingticio/llmg/pkg/grpc"
 )
 
 func Modules() fx.Option {

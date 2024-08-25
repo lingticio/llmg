@@ -11,9 +11,9 @@ import (
 	"io"
 
 	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/lingticio/gateway/internal/graph/openai/generated"
-	"github.com/lingticio/gateway/internal/graph/openai/model"
-	"github.com/lingticio/gateway/internal/graph/server/middlewares"
+	"github.com/lingticio/llmg/internal/graph/openai/generated"
+	"github.com/lingticio/llmg/internal/graph/openai/model"
+	"github.com/lingticio/llmg/internal/graph/server/middlewares"
 	"github.com/samber/lo"
 	"github.com/sashabaranov/go-openai"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -49,10 +49,10 @@ func (r *mutationResolver) CreateChatCompletion(ctx context.Context, input model
 				FinishReason: lo.ToPtr(model.FinishReason(item.FinishReason)),
 			}
 			if item.LogProbs != nil {
-				choice.Logprobs = new(model.LogProbs)
+				choice.LogProbs = new(model.LogProbs)
 			}
 			if item.LogProbs != nil && item.LogProbs.Content != nil {
-				choice.Logprobs.Content = logProbsToTokenLogProbs(item.LogProbs.Content)
+				choice.LogProbs.Content = logProbsToTokenLogProbs(item.LogProbs.Content)
 			}
 
 			return choice
@@ -102,8 +102,6 @@ func (r *subscriptionResolver) CreateChatCompletionStream(ctx context.Context, i
 				close(ch)
 				break
 			}
-
-			err = errors.New("stream error")
 			if err != nil {
 				r.Logger.Error("failed to receive chat completion stream", zap.Error(err))
 				transport.AddSubscriptionError(ctx, &gqlerror.Error{

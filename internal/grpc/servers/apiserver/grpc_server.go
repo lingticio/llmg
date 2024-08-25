@@ -9,9 +9,9 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
-	"github.com/lingticio/gateway/internal/configs"
-	"github.com/lingticio/gateway/internal/grpc/servers/interceptors"
-	grpcpkg "github.com/lingticio/gateway/pkg/grpc"
+	"github.com/lingticio/llmg/internal/configs"
+	"github.com/lingticio/llmg/internal/grpc/servers/interceptors"
+	grpcpkg "github.com/lingticio/llmg/pkg/grpc"
 )
 
 type NewGRPCServerParams struct {
@@ -47,7 +47,7 @@ func NewGRPCServer() func(params NewGRPCServerParams) *GRPCServer {
 		})
 
 		return &GRPCServer{
-			ListenAddr: params.Config.LingticIo.Gateway.Grpc.Addr,
+			ListenAddr: params.Config.LingticIo.LLMG.Grpc.Addr,
 			server:     server,
 			register:   params.Register,
 		}

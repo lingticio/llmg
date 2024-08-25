@@ -14,7 +14,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/lingticio/gateway/internal/graph/openai/model"
+	"github.com/lingticio/llmg/internal/graph/openai/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -63,7 +63,7 @@ type ComplexityRoot struct {
 	ChatCompletionChoice struct {
 		FinishReason func(childComplexity int) int
 		Index        func(childComplexity int) int
-		Logprobs     func(childComplexity int) int
+		LogProbs     func(childComplexity int) int
 		Message      func(childComplexity int) int
 	}
 
@@ -304,12 +304,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ChatCompletionChoice.Index(childComplexity), true
 
-	case "ChatCompletionChoice.logprobs":
-		if e.complexity.ChatCompletionChoice.Logprobs == nil {
+	case "ChatCompletionChoice.logProbs":
+		if e.complexity.ChatCompletionChoice.LogProbs == nil {
 			break
 		}
 
-		return e.complexity.ChatCompletionChoice.Logprobs(childComplexity), true
+		return e.complexity.ChatCompletionChoice.LogProbs(childComplexity), true
 
 	case "ChatCompletionChoice.message":
 		if e.complexity.ChatCompletionChoice.Message == nil {
@@ -1030,7 +1030,7 @@ type ChatCompletionChoice {
   """
   Log probability information for the choice.
   """
-  logprobs: LogProbs
+  logProbs: LogProbs
 }
 
 union ChatCompletionMessageContent = ChatCompletionTextContent | ChatCompletionArrayContent
@@ -1250,7 +1250,7 @@ type TokenLogProb {
   """
   bytes: [Int!]!
   """
-  List of the most likely tokens and their log probability, at this token position. In rare cases, there may be fewer than the number of requested ` + "`" + `top_logprobs` + "`" + ` returned.
+  List of the most likely tokens and their log probability, at this token position. In rare cases, there may be fewer than the number of requested ` + "`" + `topLogProbs` + "`" + ` returned.
   """
   topLogProbs: [TopLogProb!]!
 }
@@ -1440,7 +1440,7 @@ input CreateChatCompletionInput {
   """
   An integer between 0 and 20 specifying the number of most likely tokens to
   return at each token position, each with an associated log probability.
-  ` + "`" + `logprobs` + "`" + ` must be set to ` + "`" + `true` + "`" + ` if this parameter is used.
+  ` + "`" + `logProbs` + "`" + ` must be set to ` + "`" + `true` + "`" + ` if this parameter is used.
   """
   topLogProbs: Int
   """
@@ -1741,7 +1741,7 @@ func (ec *executionContext) field_Mutation_createChatCompletion_args(ctx context
 	var arg0 model.CreateChatCompletionInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateChatCompletionInput2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateChatCompletionInput2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1813,7 +1813,7 @@ func (ec *executionContext) field_Subscription_createChatCompletionStream_args(c
 	var arg0 model.CreateChatCompletionInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateChatCompletionInput2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateChatCompletionInput2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1888,7 +1888,7 @@ func (ec *executionContext) _ChatCompletionArrayContent_parts(ctx context.Contex
 	}
 	res := resTmp.([]model.ChatCompletionMessageContentPart)
 	fc.Result = res
-	return ec.marshalNChatCompletionMessageContentPart2ᚕgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPartᚄ(ctx, field.Selections, res)
+	return ec.marshalNChatCompletionMessageContentPart2ᚕgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPartᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionArrayContent_parts(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1973,7 +1973,7 @@ func (ec *executionContext) _ChatCompletionAssistantMessage_content(ctx context.
 	}
 	res := resTmp.(model.ChatCompletionMessageContent)
 	fc.Result = res
-	return ec.marshalOChatCompletionMessageContent2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContent(ctx, field.Selections, res)
+	return ec.marshalOChatCompletionMessageContent2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContent(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionAssistantMessage_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2055,7 +2055,7 @@ func (ec *executionContext) _ChatCompletionAssistantMessage_toolCalls(ctx contex
 	}
 	res := resTmp.([]*model.ChatCompletionMessageToolCall)
 	fc.Result = res
-	return ec.marshalOChatCompletionMessageToolCall2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallᚄ(ctx, field.Selections, res)
+	return ec.marshalOChatCompletionMessageToolCall2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionAssistantMessage_toolCalls(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2192,7 +2192,7 @@ func (ec *executionContext) _ChatCompletionChoice_message(ctx context.Context, f
 	}
 	res := resTmp.(model.ChatCompletionMessage)
 	fc.Result = res
-	return ec.marshalNChatCompletionMessage2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessage(ctx, field.Selections, res)
+	return ec.marshalNChatCompletionMessage2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionChoice_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2233,7 +2233,7 @@ func (ec *executionContext) _ChatCompletionChoice_finishReason(ctx context.Conte
 	}
 	res := resTmp.(*model.FinishReason)
 	fc.Result = res
-	return ec.marshalOFinishReason2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFinishReason(ctx, field.Selections, res)
+	return ec.marshalOFinishReason2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFinishReason(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionChoice_finishReason(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2249,8 +2249,8 @@ func (ec *executionContext) fieldContext_ChatCompletionChoice_finishReason(_ con
 	return fc, nil
 }
 
-func (ec *executionContext) _ChatCompletionChoice_logprobs(ctx context.Context, field graphql.CollectedField, obj *model.ChatCompletionChoice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ChatCompletionChoice_logprobs(ctx, field)
+func (ec *executionContext) _ChatCompletionChoice_logProbs(ctx context.Context, field graphql.CollectedField, obj *model.ChatCompletionChoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ChatCompletionChoice_logProbs(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2263,7 +2263,7 @@ func (ec *executionContext) _ChatCompletionChoice_logprobs(ctx context.Context, 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Logprobs, nil
+		return obj.LogProbs, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2274,10 +2274,10 @@ func (ec *executionContext) _ChatCompletionChoice_logprobs(ctx context.Context, 
 	}
 	res := resTmp.(*model.LogProbs)
 	fc.Result = res
-	return ec.marshalOLogProbs2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐLogProbs(ctx, field.Selections, res)
+	return ec.marshalOLogProbs2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐLogProbs(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ChatCompletionChoice_logprobs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ChatCompletionChoice_logProbs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ChatCompletionChoice",
 		Field:      field,
@@ -2324,7 +2324,7 @@ func (ec *executionContext) _ChatCompletionContentPartImage_imageUrl(ctx context
 	}
 	res := resTmp.(*model.ChatCompletionContentPartImageURL)
 	fc.Result = res
-	return ec.marshalNChatCompletionContentPartImageURL2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionContentPartImageURL(ctx, field.Selections, res)
+	return ec.marshalNChatCompletionContentPartImageURL2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionContentPartImageURL(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionContentPartImage_imageUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2459,7 +2459,7 @@ func (ec *executionContext) _ChatCompletionContentPartImageURL_detail(ctx contex
 	}
 	res := resTmp.(*model.ImageDetail)
 	fc.Result = res
-	return ec.marshalOImageDetail2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐImageDetail(ctx, field.Selections, res)
+	return ec.marshalOImageDetail2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐImageDetail(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionContentPartImageURL_detail(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2635,7 +2635,7 @@ func (ec *executionContext) _ChatCompletionMessageToolCall_function(ctx context.
 	}
 	res := resTmp.(*model.FunctionCall)
 	fc.Result = res
-	return ec.marshalNFunctionCall2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCall(ctx, field.Selections, res)
+	return ec.marshalNFunctionCall2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCall(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionMessageToolCall_function(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2855,7 +2855,7 @@ func (ec *executionContext) _ChatCompletionMessageToolCallChunk_function(ctx con
 	}
 	res := resTmp.(*model.FunctionCallChunk)
 	fc.Result = res
-	return ec.marshalOFunctionCallChunk2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallChunk(ctx, field.Selections, res)
+	return ec.marshalOFunctionCallChunk2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallChunk(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionMessageToolCallChunk_function(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3081,7 +3081,7 @@ func (ec *executionContext) _ChatCompletionResult_choices(ctx context.Context, f
 	}
 	res := resTmp.([]*model.ChatCompletionChoice)
 	fc.Result = res
-	return ec.marshalNChatCompletionChoice2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionChoiceᚄ(ctx, field.Selections, res)
+	return ec.marshalNChatCompletionChoice2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionChoiceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionResult_choices(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3098,8 +3098,8 @@ func (ec *executionContext) fieldContext_ChatCompletionResult_choices(_ context.
 				return ec.fieldContext_ChatCompletionChoice_message(ctx, field)
 			case "finishReason":
 				return ec.fieldContext_ChatCompletionChoice_finishReason(ctx, field)
-			case "logprobs":
-				return ec.fieldContext_ChatCompletionChoice_logprobs(ctx, field)
+			case "logProbs":
+				return ec.fieldContext_ChatCompletionChoice_logProbs(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ChatCompletionChoice", field.Name)
 		},
@@ -3135,7 +3135,7 @@ func (ec *executionContext) _ChatCompletionResult_usage(ctx context.Context, fie
 	}
 	res := resTmp.(*model.Usage)
 	fc.Result = res
-	return ec.marshalNUsage2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐUsage(ctx, field.Selections, res)
+	return ec.marshalNUsage2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐUsage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionResult_usage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3272,7 +3272,7 @@ func (ec *executionContext) _ChatCompletionStreamChunkChoice_delta(ctx context.C
 	}
 	res := resTmp.(*model.ChatCompletionStreamResponseDelta)
 	fc.Result = res
-	return ec.marshalNChatCompletionStreamResponseDelta2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamResponseDelta(ctx, field.Selections, res)
+	return ec.marshalNChatCompletionStreamResponseDelta2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamResponseDelta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionStreamChunkChoice_delta(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3323,7 +3323,7 @@ func (ec *executionContext) _ChatCompletionStreamChunkChoice_finishReason(ctx co
 	}
 	res := resTmp.(*model.FinishReason)
 	fc.Result = res
-	return ec.marshalOFinishReason2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFinishReason(ctx, field.Selections, res)
+	return ec.marshalOFinishReason2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFinishReason(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionStreamChunkChoice_finishReason(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3449,7 +3449,7 @@ func (ec *executionContext) _ChatCompletionStreamResponseDelta_toolCalls(ctx con
 	}
 	res := resTmp.([]*model.ChatCompletionMessageToolCallChunk)
 	fc.Result = res
-	return ec.marshalOChatCompletionMessageToolCallChunk2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallChunkᚄ(ctx, field.Selections, res)
+	return ec.marshalOChatCompletionMessageToolCallChunk2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallChunkᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionStreamResponseDelta_toolCalls(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3500,7 +3500,7 @@ func (ec *executionContext) _ChatCompletionStreamResponseDelta_functionCall(ctx 
 	}
 	res := resTmp.(*model.FunctionCall)
 	fc.Result = res
-	return ec.marshalOFunctionCall2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCall(ctx, field.Selections, res)
+	return ec.marshalOFunctionCall2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCall(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionStreamResponseDelta_functionCall(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3726,7 +3726,7 @@ func (ec *executionContext) _ChatCompletionStreamResult_choices(ctx context.Cont
 	}
 	res := resTmp.([]*model.ChatCompletionStreamChunkChoice)
 	fc.Result = res
-	return ec.marshalNChatCompletionStreamChunkChoice2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamChunkChoiceᚄ(ctx, field.Selections, res)
+	return ec.marshalNChatCompletionStreamChunkChoice2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamChunkChoiceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionStreamResult_choices(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3816,7 +3816,7 @@ func (ec *executionContext) _ChatCompletionStreamResult_usage(ctx context.Contex
 	}
 	res := resTmp.(*model.Usage)
 	fc.Result = res
-	return ec.marshalOUsage2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐUsage(ctx, field.Selections, res)
+	return ec.marshalOUsage2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐUsage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionStreamResult_usage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3912,7 +3912,7 @@ func (ec *executionContext) _ChatCompletionSystemMessage_content(ctx context.Con
 	}
 	res := resTmp.(model.ChatCompletionMessageContent)
 	fc.Result = res
-	return ec.marshalNChatCompletionMessageContent2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContent(ctx, field.Selections, res)
+	return ec.marshalNChatCompletionMessageContent2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContent(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionSystemMessage_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4085,7 +4085,7 @@ func (ec *executionContext) _ChatCompletionToolMessage_content(ctx context.Conte
 	}
 	res := resTmp.(model.ChatCompletionMessageContent)
 	fc.Result = res
-	return ec.marshalNChatCompletionMessageContent2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContent(ctx, field.Selections, res)
+	return ec.marshalNChatCompletionMessageContent2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContent(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionToolMessage_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4258,7 +4258,7 @@ func (ec *executionContext) _ChatCompletionUserMessage_content(ctx context.Conte
 	}
 	res := resTmp.(model.ChatCompletionMessageContent)
 	fc.Result = res
-	return ec.marshalNChatCompletionMessageContent2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContent(ctx, field.Selections, res)
+	return ec.marshalNChatCompletionMessageContent2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContent(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ChatCompletionUserMessage_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4519,7 +4519,7 @@ func (ec *executionContext) _LogProbs_content(ctx context.Context, field graphql
 	}
 	res := resTmp.([]*model.TokenLogProb)
 	fc.Result = res
-	return ec.marshalNTokenLogProb2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐTokenLogProbᚄ(ctx, field.Selections, res)
+	return ec.marshalNTokenLogProb2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐTokenLogProbᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_LogProbs_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4573,7 +4573,7 @@ func (ec *executionContext) _LogProbs_refusal(ctx context.Context, field graphql
 	}
 	res := resTmp.([]*model.TokenLogProb)
 	fc.Result = res
-	return ec.marshalNTokenLogProb2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐTokenLogProbᚄ(ctx, field.Selections, res)
+	return ec.marshalNTokenLogProb2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐTokenLogProbᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_LogProbs_refusal(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4671,7 +4671,7 @@ func (ec *executionContext) _ModelConnection_edges(ctx context.Context, field gr
 	}
 	res := resTmp.([]*model.ModelEdge)
 	fc.Result = res
-	return ec.marshalNModelEdge2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelEdgeᚄ(ctx, field.Selections, res)
+	return ec.marshalNModelEdge2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelEdgeᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ModelConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4721,7 +4721,7 @@ func (ec *executionContext) _ModelConnection_pageInfo(ctx context.Context, field
 	}
 	res := resTmp.(*model.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ModelConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4775,7 +4775,7 @@ func (ec *executionContext) _ModelEdge_node(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*model.Model)
 	fc.Result = res
-	return ec.marshalNModel2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐModel(ctx, field.Selections, res)
+	return ec.marshalNModel2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐModel(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ModelEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4867,7 +4867,7 @@ func (ec *executionContext) _Mutation_createChatCompletion(ctx context.Context, 
 	}
 	res := resTmp.(*model.ChatCompletionResult)
 	fc.Result = res
-	return ec.marshalNChatCompletionResult2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionResult(ctx, field.Selections, res)
+	return ec.marshalNChatCompletionResult2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createChatCompletion(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5108,7 +5108,7 @@ func (ec *executionContext) _Query_models(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(*model.ModelConnection)
 	fc.Result = res
-	return ec.marshalNModelConnection2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelConnection(ctx, field.Selections, res)
+	return ec.marshalNModelConnection2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_models(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5306,7 +5306,7 @@ func (ec *executionContext) _Subscription_createChatCompletionStream(ctx context
 				w.Write([]byte{'{'})
 				graphql.MarshalString(field.Alias).MarshalGQL(w)
 				w.Write([]byte{':'})
-				ec.marshalNChatCompletionStreamResult2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamResult(ctx, field.Selections, res).MarshalGQL(w)
+				ec.marshalNChatCompletionStreamResult2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamResult(ctx, field.Selections, res).MarshalGQL(w)
 				w.Write([]byte{'}'})
 			})
 		case <-ctx.Done():
@@ -5515,7 +5515,7 @@ func (ec *executionContext) _TokenLogProb_topLogProbs(ctx context.Context, field
 	}
 	res := resTmp.([]*model.TopLogProb)
 	fc.Result = res
-	return ec.marshalNTopLogProb2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐTopLogProbᚄ(ctx, field.Selections, res)
+	return ec.marshalNTopLogProb2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐTopLogProbᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_TokenLogProb_topLogProbs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7599,7 +7599,7 @@ func (ec *executionContext) unmarshalInputChatCompletionContentPartImageURLInput
 			it.URL = data
 		case "detail":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("detail"))
-			data, err := ec.unmarshalOImageDetail2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐImageDetail(ctx, v)
+			data, err := ec.unmarshalOImageDetail2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐImageDetail(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7640,7 +7640,7 @@ func (ec *executionContext) unmarshalInputChatCompletionMessageContentPartInput(
 			it.Text = data
 		case "imageUrl":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("imageUrl"))
-			data, err := ec.unmarshalOChatCompletionContentPartImageURLInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionContentPartImageURLInput(ctx, v)
+			data, err := ec.unmarshalOChatCompletionContentPartImageURLInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionContentPartImageURLInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7681,7 +7681,7 @@ func (ec *executionContext) unmarshalInputChatCompletionMessageInput(ctx context
 			it.Content = data
 		case "multiContent":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("multiContent"))
-			data, err := ec.unmarshalOChatCompletionMessageContentPartInput2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPartInputᚄ(ctx, v)
+			data, err := ec.unmarshalOChatCompletionMessageContentPartInput2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPartInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7695,14 +7695,14 @@ func (ec *executionContext) unmarshalInputChatCompletionMessageInput(ctx context
 			it.Name = data
 		case "functionCall":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("functionCall"))
-			data, err := ec.unmarshalOFunctionCallInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallInput(ctx, v)
+			data, err := ec.unmarshalOFunctionCallInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.FunctionCall = data
 		case "toolCalls":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("toolCalls"))
-			data, err := ec.unmarshalOChatCompletionMessageToolCallInput2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallInputᚄ(ctx, v)
+			data, err := ec.unmarshalOChatCompletionMessageToolCallInput2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7743,7 +7743,7 @@ func (ec *executionContext) unmarshalInputChatCompletionMessageToolCallInput(ctx
 			it.ID = data
 		case "function":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("function"))
-			data, err := ec.unmarshalNFunctionCallInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallInput(ctx, v)
+			data, err := ec.unmarshalNFunctionCallInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7777,7 +7777,7 @@ func (ec *executionContext) unmarshalInputChatCompletionTool(ctx context.Context
 		switch k {
 		case "function":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("function"))
-			data, err := ec.unmarshalOChatCompletionToolFunction2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionToolFunction(ctx, v)
+			data, err := ec.unmarshalOChatCompletionToolFunction2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionToolFunction(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7859,7 +7859,7 @@ func (ec *executionContext) unmarshalInputCreateChatCompletionInput(ctx context.
 		switch k {
 		case "messages":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messages"))
-			data, err := ec.unmarshalNChatCompletionMessageInput2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageInputᚄ(ctx, v)
+			data, err := ec.unmarshalNChatCompletionMessageInput2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7922,7 +7922,7 @@ func (ec *executionContext) unmarshalInputCreateChatCompletionInput(ctx context.
 			it.PresencePenalty = data
 		case "responseFormat":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("responseFormat"))
-			data, err := ec.unmarshalOResponseFormatInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐResponseFormatInput(ctx, v)
+			data, err := ec.unmarshalOResponseFormatInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐResponseFormatInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7936,7 +7936,7 @@ func (ec *executionContext) unmarshalInputCreateChatCompletionInput(ctx context.
 			it.Seed = data
 		case "serviceTier":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceTier"))
-			data, err := ec.unmarshalOCreateChatCompletionServiceTier2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionServiceTier(ctx, v)
+			data, err := ec.unmarshalOCreateChatCompletionServiceTier2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionServiceTier(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7957,7 +7957,7 @@ func (ec *executionContext) unmarshalInputCreateChatCompletionInput(ctx context.
 			it.Stream = data
 		case "streamOptions":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("streamOptions"))
-			data, err := ec.unmarshalOCreateChatCompletionStreamOptions2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionStreamOptions(ctx, v)
+			data, err := ec.unmarshalOCreateChatCompletionStreamOptions2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionStreamOptions(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7971,14 +7971,14 @@ func (ec *executionContext) unmarshalInputCreateChatCompletionInput(ctx context.
 			it.Temperature = data
 		case "toolChoice":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("toolChoice"))
-			data, err := ec.unmarshalOChatCompletionToolChoiceOption2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionToolChoiceOption(ctx, v)
+			data, err := ec.unmarshalOChatCompletionToolChoiceOption2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionToolChoiceOption(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ToolChoice = data
 		case "tools":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tools"))
-			data, err := ec.unmarshalOChatCompletionTool2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionTool(ctx, v)
+			data, err := ec.unmarshalOChatCompletionTool2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionTool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8142,7 +8142,7 @@ func (ec *executionContext) unmarshalInputResponseFormatInput(ctx context.Contex
 			it.Type = data
 		case "jsonSchema":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("jsonSchema"))
-			data, err := ec.unmarshalOJSONSchemaInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐJSONSchemaInput(ctx, v)
+			data, err := ec.unmarshalOJSONSchemaInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐJSONSchemaInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8353,8 +8353,8 @@ func (ec *executionContext) _ChatCompletionChoice(ctx context.Context, sel ast.S
 			}
 		case "finishReason":
 			out.Values[i] = ec._ChatCompletionChoice_finishReason(ctx, field, obj)
-		case "logprobs":
-			out.Values[i] = ec._ChatCompletionChoice_logprobs(ctx, field, obj)
+		case "logProbs":
+			out.Values[i] = ec._ChatCompletionChoice_logProbs(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9947,7 +9947,7 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNChatCompletionChoice2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionChoiceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ChatCompletionChoice) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionChoice2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionChoiceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ChatCompletionChoice) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -9971,7 +9971,7 @@ func (ec *executionContext) marshalNChatCompletionChoice2ᚕᚖgithubᚗcomᚋli
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNChatCompletionChoice2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionChoice(ctx, sel, v[i])
+			ret[i] = ec.marshalNChatCompletionChoice2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionChoice(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -9991,7 +9991,7 @@ func (ec *executionContext) marshalNChatCompletionChoice2ᚕᚖgithubᚗcomᚋli
 	return ret
 }
 
-func (ec *executionContext) marshalNChatCompletionChoice2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionChoice(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionChoice) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionChoice2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionChoice(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionChoice) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10001,7 +10001,7 @@ func (ec *executionContext) marshalNChatCompletionChoice2ᚖgithubᚗcomᚋlingt
 	return ec._ChatCompletionChoice(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNChatCompletionContentPartImageURL2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionContentPartImageURL(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionContentPartImageURL) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionContentPartImageURL2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionContentPartImageURL(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionContentPartImageURL) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10011,7 +10011,7 @@ func (ec *executionContext) marshalNChatCompletionContentPartImageURL2ᚖgithub�
 	return ec._ChatCompletionContentPartImageURL(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNChatCompletionMessage2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessage(ctx context.Context, sel ast.SelectionSet, v model.ChatCompletionMessage) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionMessage2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessage(ctx context.Context, sel ast.SelectionSet, v model.ChatCompletionMessage) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10021,7 +10021,7 @@ func (ec *executionContext) marshalNChatCompletionMessage2githubᚗcomᚋlingtic
 	return ec._ChatCompletionMessage(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNChatCompletionMessageContent2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContent(ctx context.Context, sel ast.SelectionSet, v model.ChatCompletionMessageContent) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionMessageContent2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContent(ctx context.Context, sel ast.SelectionSet, v model.ChatCompletionMessageContent) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10031,7 +10031,7 @@ func (ec *executionContext) marshalNChatCompletionMessageContent2githubᚗcomᚋ
 	return ec._ChatCompletionMessageContent(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNChatCompletionMessageContentPart2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPart(ctx context.Context, sel ast.SelectionSet, v model.ChatCompletionMessageContentPart) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionMessageContentPart2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPart(ctx context.Context, sel ast.SelectionSet, v model.ChatCompletionMessageContentPart) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10041,7 +10041,7 @@ func (ec *executionContext) marshalNChatCompletionMessageContentPart2githubᚗco
 	return ec._ChatCompletionMessageContentPart(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNChatCompletionMessageContentPart2ᚕgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPartᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ChatCompletionMessageContentPart) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionMessageContentPart2ᚕgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPartᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ChatCompletionMessageContentPart) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -10065,7 +10065,7 @@ func (ec *executionContext) marshalNChatCompletionMessageContentPart2ᚕgithub�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNChatCompletionMessageContentPart2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPart(ctx, sel, v[i])
+			ret[i] = ec.marshalNChatCompletionMessageContentPart2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPart(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10085,12 +10085,12 @@ func (ec *executionContext) marshalNChatCompletionMessageContentPart2ᚕgithub�
 	return ret
 }
 
-func (ec *executionContext) unmarshalNChatCompletionMessageContentPartInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPartInput(ctx context.Context, v interface{}) (*model.ChatCompletionMessageContentPartInput, error) {
+func (ec *executionContext) unmarshalNChatCompletionMessageContentPartInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPartInput(ctx context.Context, v interface{}) (*model.ChatCompletionMessageContentPartInput, error) {
 	res, err := ec.unmarshalInputChatCompletionMessageContentPartInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNChatCompletionMessageInput2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageInputᚄ(ctx context.Context, v interface{}) ([]*model.ChatCompletionMessageInput, error) {
+func (ec *executionContext) unmarshalNChatCompletionMessageInput2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageInputᚄ(ctx context.Context, v interface{}) ([]*model.ChatCompletionMessageInput, error) {
 	var vSlice []interface{}
 	if v != nil {
 		vSlice = graphql.CoerceList(v)
@@ -10099,7 +10099,7 @@ func (ec *executionContext) unmarshalNChatCompletionMessageInput2ᚕᚖgithubᚗ
 	res := make([]*model.ChatCompletionMessageInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNChatCompletionMessageInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNChatCompletionMessageInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -10107,12 +10107,12 @@ func (ec *executionContext) unmarshalNChatCompletionMessageInput2ᚕᚖgithubᚗ
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalNChatCompletionMessageInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageInput(ctx context.Context, v interface{}) (*model.ChatCompletionMessageInput, error) {
+func (ec *executionContext) unmarshalNChatCompletionMessageInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageInput(ctx context.Context, v interface{}) (*model.ChatCompletionMessageInput, error) {
 	res, err := ec.unmarshalInputChatCompletionMessageInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNChatCompletionMessageToolCall2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCall(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionMessageToolCall) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionMessageToolCall2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCall(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionMessageToolCall) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10122,7 +10122,7 @@ func (ec *executionContext) marshalNChatCompletionMessageToolCall2ᚖgithubᚗco
 	return ec._ChatCompletionMessageToolCall(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNChatCompletionMessageToolCallChunk2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallChunk(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionMessageToolCallChunk) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionMessageToolCallChunk2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallChunk(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionMessageToolCallChunk) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10132,16 +10132,16 @@ func (ec *executionContext) marshalNChatCompletionMessageToolCallChunk2ᚖgithub
 	return ec._ChatCompletionMessageToolCallChunk(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNChatCompletionMessageToolCallInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallInput(ctx context.Context, v interface{}) (*model.ChatCompletionMessageToolCallInput, error) {
+func (ec *executionContext) unmarshalNChatCompletionMessageToolCallInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallInput(ctx context.Context, v interface{}) (*model.ChatCompletionMessageToolCallInput, error) {
 	res, err := ec.unmarshalInputChatCompletionMessageToolCallInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNChatCompletionResult2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionResult(ctx context.Context, sel ast.SelectionSet, v model.ChatCompletionResult) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionResult2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionResult(ctx context.Context, sel ast.SelectionSet, v model.ChatCompletionResult) graphql.Marshaler {
 	return ec._ChatCompletionResult(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNChatCompletionResult2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionResult(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionResult) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionResult2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionResult(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10151,7 +10151,7 @@ func (ec *executionContext) marshalNChatCompletionResult2ᚖgithubᚗcomᚋlingt
 	return ec._ChatCompletionResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNChatCompletionStreamChunkChoice2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamChunkChoiceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ChatCompletionStreamChunkChoice) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionStreamChunkChoice2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamChunkChoiceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ChatCompletionStreamChunkChoice) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -10175,7 +10175,7 @@ func (ec *executionContext) marshalNChatCompletionStreamChunkChoice2ᚕᚖgithub
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNChatCompletionStreamChunkChoice2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamChunkChoice(ctx, sel, v[i])
+			ret[i] = ec.marshalNChatCompletionStreamChunkChoice2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamChunkChoice(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10195,7 +10195,7 @@ func (ec *executionContext) marshalNChatCompletionStreamChunkChoice2ᚕᚖgithub
 	return ret
 }
 
-func (ec *executionContext) marshalNChatCompletionStreamChunkChoice2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamChunkChoice(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionStreamChunkChoice) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionStreamChunkChoice2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamChunkChoice(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionStreamChunkChoice) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10205,7 +10205,7 @@ func (ec *executionContext) marshalNChatCompletionStreamChunkChoice2ᚖgithubᚗ
 	return ec._ChatCompletionStreamChunkChoice(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNChatCompletionStreamResponseDelta2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamResponseDelta(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionStreamResponseDelta) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionStreamResponseDelta2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamResponseDelta(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionStreamResponseDelta) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10215,11 +10215,11 @@ func (ec *executionContext) marshalNChatCompletionStreamResponseDelta2ᚖgithub�
 	return ec._ChatCompletionStreamResponseDelta(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNChatCompletionStreamResult2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamResult(ctx context.Context, sel ast.SelectionSet, v model.ChatCompletionStreamResult) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionStreamResult2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamResult(ctx context.Context, sel ast.SelectionSet, v model.ChatCompletionStreamResult) graphql.Marshaler {
 	return ec._ChatCompletionStreamResult(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNChatCompletionStreamResult2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamResult(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionStreamResult) graphql.Marshaler {
+func (ec *executionContext) marshalNChatCompletionStreamResult2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionStreamResult(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionStreamResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10229,7 +10229,7 @@ func (ec *executionContext) marshalNChatCompletionStreamResult2ᚖgithubᚗcom�
 	return ec._ChatCompletionStreamResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCreateChatCompletionInput2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionInput(ctx context.Context, v interface{}) (model.CreateChatCompletionInput, error) {
+func (ec *executionContext) unmarshalNCreateChatCompletionInput2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionInput(ctx context.Context, v interface{}) (model.CreateChatCompletionInput, error) {
 	res, err := ec.unmarshalInputCreateChatCompletionInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10249,7 +10249,7 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
-func (ec *executionContext) marshalNFunctionCall2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCall(ctx context.Context, sel ast.SelectionSet, v *model.FunctionCall) graphql.Marshaler {
+func (ec *executionContext) marshalNFunctionCall2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCall(ctx context.Context, sel ast.SelectionSet, v *model.FunctionCall) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10259,7 +10259,7 @@ func (ec *executionContext) marshalNFunctionCall2ᚖgithubᚗcomᚋlingticioᚋg
 	return ec._FunctionCall(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNFunctionCallInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallInput(ctx context.Context, v interface{}) (*model.FunctionCallInput, error) {
+func (ec *executionContext) unmarshalNFunctionCallInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallInput(ctx context.Context, v interface{}) (*model.FunctionCallInput, error) {
 	res, err := ec.unmarshalInputFunctionCallInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10347,7 +10347,7 @@ func (ec *executionContext) marshalNMap2map(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNModel2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐModel(ctx context.Context, sel ast.SelectionSet, v *model.Model) graphql.Marshaler {
+func (ec *executionContext) marshalNModel2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐModel(ctx context.Context, sel ast.SelectionSet, v *model.Model) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10357,11 +10357,11 @@ func (ec *executionContext) marshalNModel2ᚖgithubᚗcomᚋlingticioᚋgateway�
 	return ec._Model(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNModelConnection2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelConnection(ctx context.Context, sel ast.SelectionSet, v model.ModelConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNModelConnection2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelConnection(ctx context.Context, sel ast.SelectionSet, v model.ModelConnection) graphql.Marshaler {
 	return ec._ModelConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNModelConnection2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelConnection(ctx context.Context, sel ast.SelectionSet, v *model.ModelConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNModelConnection2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelConnection(ctx context.Context, sel ast.SelectionSet, v *model.ModelConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10371,7 +10371,7 @@ func (ec *executionContext) marshalNModelConnection2ᚖgithubᚗcomᚋlingticio�
 	return ec._ModelConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNModelEdge2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ModelEdge) graphql.Marshaler {
+func (ec *executionContext) marshalNModelEdge2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ModelEdge) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -10395,7 +10395,7 @@ func (ec *executionContext) marshalNModelEdge2ᚕᚖgithubᚗcomᚋlingticioᚋg
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNModelEdge2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelEdge(ctx, sel, v[i])
+			ret[i] = ec.marshalNModelEdge2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10415,7 +10415,7 @@ func (ec *executionContext) marshalNModelEdge2ᚕᚖgithubᚗcomᚋlingticioᚋg
 	return ret
 }
 
-func (ec *executionContext) marshalNModelEdge2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelEdge(ctx context.Context, sel ast.SelectionSet, v *model.ModelEdge) graphql.Marshaler {
+func (ec *executionContext) marshalNModelEdge2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐModelEdge(ctx context.Context, sel ast.SelectionSet, v *model.ModelEdge) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10425,7 +10425,7 @@ func (ec *executionContext) marshalNModelEdge2ᚖgithubᚗcomᚋlingticioᚋgate
 	return ec._ModelEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *model.PageInfo) graphql.Marshaler {
+func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *model.PageInfo) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10450,7 +10450,7 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNTokenLogProb2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐTokenLogProbᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TokenLogProb) graphql.Marshaler {
+func (ec *executionContext) marshalNTokenLogProb2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐTokenLogProbᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TokenLogProb) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -10474,7 +10474,7 @@ func (ec *executionContext) marshalNTokenLogProb2ᚕᚖgithubᚗcomᚋlingticio�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNTokenLogProb2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐTokenLogProb(ctx, sel, v[i])
+			ret[i] = ec.marshalNTokenLogProb2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐTokenLogProb(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10494,7 +10494,7 @@ func (ec *executionContext) marshalNTokenLogProb2ᚕᚖgithubᚗcomᚋlingticio�
 	return ret
 }
 
-func (ec *executionContext) marshalNTokenLogProb2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐTokenLogProb(ctx context.Context, sel ast.SelectionSet, v *model.TokenLogProb) graphql.Marshaler {
+func (ec *executionContext) marshalNTokenLogProb2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐTokenLogProb(ctx context.Context, sel ast.SelectionSet, v *model.TokenLogProb) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10504,7 +10504,7 @@ func (ec *executionContext) marshalNTokenLogProb2ᚖgithubᚗcomᚋlingticioᚋg
 	return ec._TokenLogProb(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNTopLogProb2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐTopLogProbᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TopLogProb) graphql.Marshaler {
+func (ec *executionContext) marshalNTopLogProb2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐTopLogProbᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TopLogProb) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -10528,7 +10528,7 @@ func (ec *executionContext) marshalNTopLogProb2ᚕᚖgithubᚗcomᚋlingticioᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNTopLogProb2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐTopLogProb(ctx, sel, v[i])
+			ret[i] = ec.marshalNTopLogProb2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐTopLogProb(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10548,7 +10548,7 @@ func (ec *executionContext) marshalNTopLogProb2ᚕᚖgithubᚗcomᚋlingticioᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalNTopLogProb2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐTopLogProb(ctx context.Context, sel ast.SelectionSet, v *model.TopLogProb) graphql.Marshaler {
+func (ec *executionContext) marshalNTopLogProb2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐTopLogProb(ctx context.Context, sel ast.SelectionSet, v *model.TopLogProb) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10558,7 +10558,7 @@ func (ec *executionContext) marshalNTopLogProb2ᚖgithubᚗcomᚋlingticioᚋgat
 	return ec._TopLogProb(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNUsage2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐUsage(ctx context.Context, sel ast.SelectionSet, v *model.Usage) graphql.Marshaler {
+func (ec *executionContext) marshalNUsage2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐUsage(ctx context.Context, sel ast.SelectionSet, v *model.Usage) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10847,7 +10847,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) unmarshalOChatCompletionContentPartImageURLInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionContentPartImageURLInput(ctx context.Context, v interface{}) (*model.ChatCompletionContentPartImageURLInput, error) {
+func (ec *executionContext) unmarshalOChatCompletionContentPartImageURLInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionContentPartImageURLInput(ctx context.Context, v interface{}) (*model.ChatCompletionContentPartImageURLInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10855,14 +10855,14 @@ func (ec *executionContext) unmarshalOChatCompletionContentPartImageURLInput2ᚖ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOChatCompletionMessageContent2githubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContent(ctx context.Context, sel ast.SelectionSet, v model.ChatCompletionMessageContent) graphql.Marshaler {
+func (ec *executionContext) marshalOChatCompletionMessageContent2githubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContent(ctx context.Context, sel ast.SelectionSet, v model.ChatCompletionMessageContent) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ChatCompletionMessageContent(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOChatCompletionMessageContentPartInput2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPartInputᚄ(ctx context.Context, v interface{}) ([]*model.ChatCompletionMessageContentPartInput, error) {
+func (ec *executionContext) unmarshalOChatCompletionMessageContentPartInput2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPartInputᚄ(ctx context.Context, v interface{}) ([]*model.ChatCompletionMessageContentPartInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10874,7 +10874,7 @@ func (ec *executionContext) unmarshalOChatCompletionMessageContentPartInput2ᚕ�
 	res := make([]*model.ChatCompletionMessageContentPartInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNChatCompletionMessageContentPartInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPartInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNChatCompletionMessageContentPartInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageContentPartInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -10882,7 +10882,7 @@ func (ec *executionContext) unmarshalOChatCompletionMessageContentPartInput2ᚕ�
 	return res, nil
 }
 
-func (ec *executionContext) marshalOChatCompletionMessageToolCall2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ChatCompletionMessageToolCall) graphql.Marshaler {
+func (ec *executionContext) marshalOChatCompletionMessageToolCall2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ChatCompletionMessageToolCall) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -10909,7 +10909,7 @@ func (ec *executionContext) marshalOChatCompletionMessageToolCall2ᚕᚖgithub�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNChatCompletionMessageToolCall2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCall(ctx, sel, v[i])
+			ret[i] = ec.marshalNChatCompletionMessageToolCall2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCall(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10929,7 +10929,7 @@ func (ec *executionContext) marshalOChatCompletionMessageToolCall2ᚕᚖgithub�
 	return ret
 }
 
-func (ec *executionContext) marshalOChatCompletionMessageToolCallChunk2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallChunkᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ChatCompletionMessageToolCallChunk) graphql.Marshaler {
+func (ec *executionContext) marshalOChatCompletionMessageToolCallChunk2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallChunkᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ChatCompletionMessageToolCallChunk) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -10956,7 +10956,7 @@ func (ec *executionContext) marshalOChatCompletionMessageToolCallChunk2ᚕᚖgit
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNChatCompletionMessageToolCallChunk2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallChunk(ctx, sel, v[i])
+			ret[i] = ec.marshalNChatCompletionMessageToolCallChunk2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallChunk(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10976,7 +10976,7 @@ func (ec *executionContext) marshalOChatCompletionMessageToolCallChunk2ᚕᚖgit
 	return ret
 }
 
-func (ec *executionContext) unmarshalOChatCompletionMessageToolCallInput2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallInputᚄ(ctx context.Context, v interface{}) ([]*model.ChatCompletionMessageToolCallInput, error) {
+func (ec *executionContext) unmarshalOChatCompletionMessageToolCallInput2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallInputᚄ(ctx context.Context, v interface{}) ([]*model.ChatCompletionMessageToolCallInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10988,7 +10988,7 @@ func (ec *executionContext) unmarshalOChatCompletionMessageToolCallInput2ᚕᚖg
 	res := make([]*model.ChatCompletionMessageToolCallInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNChatCompletionMessageToolCallInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNChatCompletionMessageToolCallInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -10996,7 +10996,7 @@ func (ec *executionContext) unmarshalOChatCompletionMessageToolCallInput2ᚕᚖg
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOChatCompletionTool2ᚕᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionTool(ctx context.Context, v interface{}) ([]*model.ChatCompletionTool, error) {
+func (ec *executionContext) unmarshalOChatCompletionTool2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionTool(ctx context.Context, v interface{}) ([]*model.ChatCompletionTool, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11008,7 +11008,7 @@ func (ec *executionContext) unmarshalOChatCompletionTool2ᚕᚖgithubᚗcomᚋli
 	res := make([]*model.ChatCompletionTool, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOChatCompletionTool2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionTool(ctx, vSlice[i])
+		res[i], err = ec.unmarshalOChatCompletionTool2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionTool(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -11016,7 +11016,7 @@ func (ec *executionContext) unmarshalOChatCompletionTool2ᚕᚖgithubᚗcomᚋli
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOChatCompletionTool2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionTool(ctx context.Context, v interface{}) (*model.ChatCompletionTool, error) {
+func (ec *executionContext) unmarshalOChatCompletionTool2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionTool(ctx context.Context, v interface{}) (*model.ChatCompletionTool, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11024,7 +11024,7 @@ func (ec *executionContext) unmarshalOChatCompletionTool2ᚖgithubᚗcomᚋlingt
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOChatCompletionToolChoiceOption2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionToolChoiceOption(ctx context.Context, v interface{}) (*model.ChatCompletionToolChoiceOption, error) {
+func (ec *executionContext) unmarshalOChatCompletionToolChoiceOption2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionToolChoiceOption(ctx context.Context, v interface{}) (*model.ChatCompletionToolChoiceOption, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11033,14 +11033,14 @@ func (ec *executionContext) unmarshalOChatCompletionToolChoiceOption2ᚖgithub�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOChatCompletionToolChoiceOption2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionToolChoiceOption(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionToolChoiceOption) graphql.Marshaler {
+func (ec *executionContext) marshalOChatCompletionToolChoiceOption2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionToolChoiceOption(ctx context.Context, sel ast.SelectionSet, v *model.ChatCompletionToolChoiceOption) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalOChatCompletionToolFunction2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionToolFunction(ctx context.Context, v interface{}) (*model.ChatCompletionToolFunction, error) {
+func (ec *executionContext) unmarshalOChatCompletionToolFunction2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionToolFunction(ctx context.Context, v interface{}) (*model.ChatCompletionToolFunction, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11048,7 +11048,7 @@ func (ec *executionContext) unmarshalOChatCompletionToolFunction2ᚖgithubᚗcom
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOCreateChatCompletionServiceTier2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionServiceTier(ctx context.Context, v interface{}) (*model.CreateChatCompletionServiceTier, error) {
+func (ec *executionContext) unmarshalOCreateChatCompletionServiceTier2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionServiceTier(ctx context.Context, v interface{}) (*model.CreateChatCompletionServiceTier, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11057,14 +11057,14 @@ func (ec *executionContext) unmarshalOCreateChatCompletionServiceTier2ᚖgithub�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOCreateChatCompletionServiceTier2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionServiceTier(ctx context.Context, sel ast.SelectionSet, v *model.CreateChatCompletionServiceTier) graphql.Marshaler {
+func (ec *executionContext) marshalOCreateChatCompletionServiceTier2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionServiceTier(ctx context.Context, sel ast.SelectionSet, v *model.CreateChatCompletionServiceTier) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalOCreateChatCompletionStreamOptions2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionStreamOptions(ctx context.Context, v interface{}) (*model.CreateChatCompletionStreamOptions, error) {
+func (ec *executionContext) unmarshalOCreateChatCompletionStreamOptions2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionStreamOptions(ctx context.Context, v interface{}) (*model.CreateChatCompletionStreamOptions, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11072,7 +11072,7 @@ func (ec *executionContext) unmarshalOCreateChatCompletionStreamOptions2ᚖgithu
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOFinishReason2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFinishReason(ctx context.Context, v interface{}) (*model.FinishReason, error) {
+func (ec *executionContext) unmarshalOFinishReason2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFinishReason(ctx context.Context, v interface{}) (*model.FinishReason, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11081,7 +11081,7 @@ func (ec *executionContext) unmarshalOFinishReason2ᚖgithubᚗcomᚋlingticio�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOFinishReason2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFinishReason(ctx context.Context, sel ast.SelectionSet, v *model.FinishReason) graphql.Marshaler {
+func (ec *executionContext) marshalOFinishReason2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFinishReason(ctx context.Context, sel ast.SelectionSet, v *model.FinishReason) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -11104,21 +11104,21 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
-func (ec *executionContext) marshalOFunctionCall2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCall(ctx context.Context, sel ast.SelectionSet, v *model.FunctionCall) graphql.Marshaler {
+func (ec *executionContext) marshalOFunctionCall2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCall(ctx context.Context, sel ast.SelectionSet, v *model.FunctionCall) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._FunctionCall(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOFunctionCallChunk2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallChunk(ctx context.Context, sel ast.SelectionSet, v *model.FunctionCallChunk) graphql.Marshaler {
+func (ec *executionContext) marshalOFunctionCallChunk2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallChunk(ctx context.Context, sel ast.SelectionSet, v *model.FunctionCallChunk) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._FunctionCallChunk(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOFunctionCallInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallInput(ctx context.Context, v interface{}) (*model.FunctionCallInput, error) {
+func (ec *executionContext) unmarshalOFunctionCallInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallInput(ctx context.Context, v interface{}) (*model.FunctionCallInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11126,7 +11126,7 @@ func (ec *executionContext) unmarshalOFunctionCallInput2ᚖgithubᚗcomᚋlingti
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOImageDetail2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐImageDetail(ctx context.Context, v interface{}) (*model.ImageDetail, error) {
+func (ec *executionContext) unmarshalOImageDetail2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐImageDetail(ctx context.Context, v interface{}) (*model.ImageDetail, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11135,7 +11135,7 @@ func (ec *executionContext) unmarshalOImageDetail2ᚖgithubᚗcomᚋlingticioᚋ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOImageDetail2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐImageDetail(ctx context.Context, sel ast.SelectionSet, v *model.ImageDetail) graphql.Marshaler {
+func (ec *executionContext) marshalOImageDetail2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐImageDetail(ctx context.Context, sel ast.SelectionSet, v *model.ImageDetail) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -11158,7 +11158,7 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) unmarshalOJSONSchemaInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐJSONSchemaInput(ctx context.Context, v interface{}) (*model.JSONSchemaInput, error) {
+func (ec *executionContext) unmarshalOJSONSchemaInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐJSONSchemaInput(ctx context.Context, v interface{}) (*model.JSONSchemaInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11166,7 +11166,7 @@ func (ec *executionContext) unmarshalOJSONSchemaInput2ᚖgithubᚗcomᚋlingtici
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOLogProbs2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐLogProbs(ctx context.Context, sel ast.SelectionSet, v *model.LogProbs) graphql.Marshaler {
+func (ec *executionContext) marshalOLogProbs2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐLogProbs(ctx context.Context, sel ast.SelectionSet, v *model.LogProbs) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -11189,7 +11189,7 @@ func (ec *executionContext) marshalOMap2map(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalOResponseFormatInput2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐResponseFormatInput(ctx context.Context, v interface{}) (*model.ResponseFormatInput, error) {
+func (ec *executionContext) unmarshalOResponseFormatInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐResponseFormatInput(ctx context.Context, v interface{}) (*model.ResponseFormatInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11245,7 +11245,7 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalOUsage2ᚖgithubᚗcomᚋlingticioᚋgatewayᚋinternalᚋgraphᚋopenaiᚋmodelᚐUsage(ctx context.Context, sel ast.SelectionSet, v *model.Usage) graphql.Marshaler {
+func (ec *executionContext) marshalOUsage2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐUsage(ctx context.Context, sel ast.SelectionSet, v *model.Usage) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

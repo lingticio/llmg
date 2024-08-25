@@ -62,7 +62,7 @@ type ChatCompletionChoice struct {
 	// - "tool_calls" if the model called a tool, or "function_call" (deprecated) if the model called a function.
 	FinishReason *FinishReason `json:"finishReason,omitempty"`
 	// Log probability information for the choice.
-	Logprobs *LogProbs `json:"logprobs,omitempty"`
+	LogProbs *LogProbs `json:"logProbs,omitempty"`
 }
 
 // Image content part of a chat completion message
@@ -396,7 +396,7 @@ type CreateChatCompletionInput struct {
 	Tools []*ChatCompletionTool `json:"tools,omitempty"`
 	// An integer between 0 and 20 specifying the number of most likely tokens to
 	// return at each token position, each with an associated log probability.
-	// `logprobs` must be set to `true` if this parameter is used.
+	// `logProbs` must be set to `true` if this parameter is used.
 	TopLogProbs *int `json:"topLogProbs,omitempty"`
 	// An alternative to sampling with temperature, called nucleus sampling, where the
 	// model considers the results of the tokens with top_p probability mass. So 0.1
@@ -498,7 +498,7 @@ type TokenLogProb struct {
 	LogProb float64 `json:"logProb"`
 	// A list of integers representing the UTF-8 bytes representation of the token. Useful in instances where characters are represented by multiple tokens and their byte representations must be combined to generate the correct text representation. Can be `null` if there is no bytes representation for the token.
 	Bytes []int `json:"bytes"`
-	// List of the most likely tokens and their log probability, at this token position. In rare cases, there may be fewer than the number of requested `top_logprobs` returned.
+	// List of the most likely tokens and their log probability, at this token position. In rare cases, there may be fewer than the number of requested `topLogProbs` returned.
 	TopLogProbs []*TopLogProb `json:"topLogProbs"`
 }
 

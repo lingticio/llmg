@@ -8,8 +8,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
-	"github.com/lingticio/gateway/internal/graph/openai/generated"
-	"github.com/lingticio/gateway/internal/graph/openai/resolvers"
+	"github.com/lingticio/llmg/internal/graph/openai/generated"
+	"github.com/lingticio/llmg/internal/graph/openai/resolvers"
 	"github.com/nekomeowww/xo/logger"
 	"go.uber.org/fx"
 )

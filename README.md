@@ -1,6 +1,18 @@
-# `gateway`
+# llmg
 
-Major monorepo for Lingtic.io gateway services.
+🧘 Extensive LLM endpoints, expended capabilities through your favorite protocols, 🕸️ GraphQL, ↔️ gRPC, ♾️ WebSocket. Extended SOTA support for structured data, function calling, instruction mapping, load balancing, grouping, intelli-routing. Advanced tracing and inference tracking.
+
+## Features
+
+- [ ] Structured data
+- [ ] Function calling
+- [ ] Instruction mapping
+- [ ] Load balancing
+- [ ] Grouping
+- [ ] Intelli-routing
+- [ ] Generative streaming
+- [ ] Advanced tracing
+- [ ] Inference tracking
 
 ## Providers
 
@@ -76,40 +88,40 @@ Besides configurations, you can always use environment variables to override the
 
 Every microservice and its entry should have similar build steps and usage as follows.
 
-### Build `gateway-grpc`
+### Build `llmg-grpc`
 
 ```shell
 go build \
   -a \
-  -o "release/lingticio/gateway-grpc" \
+  -o "release/lingticio/llmg-grpc" \
   -ldflags " -X './internal/meta.Version=1.0.0' -X './internal/meta.LastCommit=abcdefg'" \
-  "./cmd/lingticio/gateway-grpc"
+  "./cmd/lingticio/llmg-grpc"
 ```
 
-### Build `gateway-grpc` with Docker
+### Build `llmg-grpc` with Docker
 
 ```shell
 docker build \
   --build-arg="BUILD_VERSION=1.0.0" \
   --build-arg="BUILD_LAST_COMMIT=abcdefg" \
-  -f cmd/lingticio/gateway-grpc/Dockerfile \
+  -f cmd/lingticio/llmg-grpc/Dockerfile \
   .
 ```
 
 ## Start the server
 
-### Start `gateway-grpc`
+### Start `llmg-grpc`
 
 With `config/config.yaml`:
 
 ```shell
-go run cmd/lingticio/gateway-grpc
+go run cmd/lingticio/llmg-grpc
 ```
 
 With `config.local.yaml`:
 
 ```shell
-go run cmd/lingticio/gateway-grpc -c $(pwd)/config/config.local.yaml
+go run cmd/lingticio/llmg-grpc -c $(pwd)/config/config.local.yaml
 ```
 
 ## Development
