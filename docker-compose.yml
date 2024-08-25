@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+  # the default PostgreSQL database service that helps services to store data
+  # db_local:
+  #   image: postgres:alpine
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_PASSWORD=123456
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_DB=postgres
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   ports:
+  #     - 5432:5432
+
+  # the default Redis service that helps services to store data
+  redis_local:
+    image: redis:7
+    restart: unless-stopped
+    environment:
+      - REDIS_PASSWORD=123456
+    command: >
+      /bin/sh -c "redis-server $${REDIS_PASSWORD:+--requirepass \"$$REDIS_PASSWORD\"}"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'redis-cli -e $${REDIS_PASSWORD:+-a "$$REDIS_PASSWORD"} --no-auth-warning ping',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 6379:6379
+
+  # # promtail service that helps services to collect logs
+  # # you can uncomment the following lines if you want to enable promtail
+  # promtail:
+  #   image: grafana/promtail:2.8.2
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./production/promtail:/etc/promtail # you may edit the ./production/promtail/config.yaml file to suit your needs
+  #     - logs/node-api-server:/var/log/services/node-api-server:ro
+  #   command: >
+  #     -config.file=/etc/promtail/config.yaml
+
+  #   # uncomment the following lines if you want to view the web ui of promtail
+  #   # ports:
+  #   #   - 9080:9080
+  #   # uncomment the following lines if you want to use your own loki service
+  #   # networks:
+  #   #   - <loki_network> # replace <loki_network> with your own loki network name
+#
+# uncomment the following lines if you want to use your own loki service
+# that live in another docker-compose.yml file
+# networks:
+#   <loki_network>: # replace <loki_network> with your own loki network name
+#     external: true
+
+volumes:
+  postgres_data:

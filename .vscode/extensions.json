@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "streetsidesoftware.code-spell-checker",
+    "mikestead.dotenv",
+    "EditorConfig.EditorConfig",
+    "yzhang.markdown-all-in-one",
+    "redhat.vscode-yaml",
+    "golang.go",
+    "bufbuild.vscode-buf",
+    "zxh404.vscode-proto3",
+    "GraphQL.vscode-graphql-execution",
+    "GraphQL.vscode-graphql",
+    "GraphQL.vscode-graphql-syntax"
+  ]
+}

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package apis.gatewayapi.v1;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/lingticio/gateway/apis/gatewayapi/v1";
+
+message ReleaseRequest {}
+
+message ReleaseResponse {
+  string version = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"1.2.0\""}]; // The version of the server.
+  string last_commit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"fefb8f1\""}]; // The last commit hash of the server.
+}
+
+service ServerService {
+  rpc Release(ReleaseRequest) returns (ReleaseResponse) {
+    option (google.api.http) = {get: "/api/v1/server/release"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the release version of the server.";
+      description: "Get the release version of the server, includes the version and the last commit hash.";
+      tags: "Server";
+    };
+  }
+}

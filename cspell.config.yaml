@@ -1,0 +1,47 @@
+version: "0.2"
+ignorePaths: []
+dictionaryDefinitions: []
+dictionaries: []
+words:
+  - apierrors
+  - apiserver
+  - APIURL
+  - bufbuild
+  - coreapi
+  - coreapiv1
+  - Detailf
+  - entgo
+  - gatewayapi
+  - gatewayapiv
+  - googleapis
+  - gqlgen
+  - grpcpkg
+  - grpcservers
+  - grpcservices
+  - jsonapi
+  - jwtclaim
+  - labstack
+  - lingtic
+  - lingticio
+  - managementapi
+  - managementapiv1
+  - modelv1
+  - nekomeowww
+  - Nillable
+  - nolint
+  - openapi
+  - openapiv2
+  - openapiv3
+  - Protobuf
+  - protocolbuffers
+  - protovalidate
+  - Rueidis
+  - rueidisstore
+  - samber
+  - serverv1
+  - Supabase
+  - thumbhash
+  - wellknowntypes
+ignoreWords: []
+import:
+  - "@cspell/dict-golang"
