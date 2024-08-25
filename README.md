@@ -2,6 +2,17 @@
 
 Major monorepo for Lingtic AI gateway services.
 
+## Providers
+
+- [x] OpenAI
+
+## Protocols
+
+- [x] GraphQL
+- [ ] gRPC
+- [ ] WebSockets
+- [ ] RESTful
+
 ## Project structure
 
 ```
@@ -66,40 +77,42 @@ Besides configurations, you can always use environment variables to override the
 
 ## Build
 
-### Build `api-server`
+Every microservice and its entry should have similar build steps and usage as follows.
+
+### Build `gateway-grpc`
 
 ```shell
 go build \
   -a \
-  -o "release/lingticio/api-server" \
+  -o "release/lingticio/gateway-grpc" \
   -ldflags " -X './internal/meta.Version=1.0.0' -X './internal/meta.LastCommit=abcdefg'" \
-  "./cmd/lingticio/api-server"
+  "./cmd/lingticio/gateway-grpc"
 ```
 
-### Build `api-server` with Docker
+### Build `gateway-grpc` with Docker
 
 ```shell
 docker build \
   --build-arg="BUILD_VERSION=1.0.0" \
   --build-arg="BUILD_LAST_COMMIT=abcdefg" \
-  -f cmd/lingticio/api-server/Dockerfile \
+  -f cmd/lingticio/gateway-grpc/Dockerfile \
   .
 ```
 
 ## Start the server
 
-### Start `api-server`
+### Start `gateway-grpc`
 
 With `config/config.yaml`:
 
 ```shell
-go run cmd/lingticio/api-server
+go run cmd/lingticio/gateway-grpc
 ```
 
 With `config.local.yaml`:
 
 ```shell
-go run cmd/lingticio/api-server -c $(pwd)/config/config.local.yaml
+go run cmd/lingticio/gateway-grpc -c $(pwd)/config/config.local.yaml
 ```
 
 ## Development
