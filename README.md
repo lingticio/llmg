@@ -22,8 +22,6 @@ Major monorepo for Lingtic AI gateway services.
 │   └── gatewayapi      # Business APIs of Gateway
 ├── cmd                 # Entry for microservices
 ├── config              # Configuration files
-├── ent                 # Ent schemas
-│   └── schema          # Ent schemas
 ├── graph               # GraphQL Schemas, gqlgen configurations
 ├── hack                # Scripts for both development, testing, deployment
 ├── internal            # Actual implementation
@@ -52,7 +50,6 @@ Major monorepo for Lingtic AI gateway services.
 ## Stacks involved
 
 - [Go](https://golang.org/)
-- [Ent](https://entgo.io/)
 - [gqlgen](https://gqlgen.com/)
 - [gRPC](https://grpc.io/)
 - [uber/zap](https://go.uber.org/zap)
@@ -186,18 +183,6 @@ The generated files includes:
 3. `*.swagger.json` files for Swagger UI
 
 Then you are off to go.
-
-## [Adding new ent schema](https://entgo.io/docs/code-gen)
-
-```shell
-go run -mod=mod entgo.io/ent/cmd/ent new <Schema Name>
-```
-
-Remember to perform code-gen after adding a new schema.
-
-```shell
-go generate ./...
-```
 
 ## [Adding new Test Doubles (a.k.a. Mocks)](https://github.com/maxbrunsfeld/counterfeiter)
 

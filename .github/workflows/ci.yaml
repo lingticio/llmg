@@ -46,16 +46,6 @@ jobs:
       - name: Test Build
         run: go build ./...
 
-  ent_check:
-    name: Check entgo.io codegen
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: "^1.22.0"
-      - uses: ent/contrib/ci@master
-
   lint:
     name: Lint
     runs-on: ubuntu-latest
