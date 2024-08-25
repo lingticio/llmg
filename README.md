@@ -1,6 +1,6 @@
 # `gateway`
 
-Major monorepo for Lingtic AI gateway services.
+Major monorepo for Lingtic.io gateway services.
 
 ## Providers
 
