@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/cmd/lingticio/api-server/main.go",
       "args": [
         "-e",
-        "${workspaceFolder}/cmd/lingticio/api-server/.env"
+        "${workspaceFolder}/cmd/lingticio/api-server/.env",
       ]
     }
   ]

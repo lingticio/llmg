@@ -8,7 +8,9 @@
 - [ ] Intelli-routing
 - [ ] Load balancing
 - [ ] Semantic cache
-- [ ] Structured data
+- [x] Structured data
+  - [x] Powered by Neuri
+  - [ ] Support any order of structured data
 - [ ] Function calling
 - [ ] Instruction mapping
 - [ ] Generative streaming
