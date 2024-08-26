@@ -12,86 +12,32 @@ import (
 )
 
 const (
-	STRING_INNER = `[^"\\]*(?:\\.[^"\\]*)*`
-	STRING       = `"` + STRING_INNER + `"`
-	INTEGER      = `(-)?(0|[1-9][0-9]*)`
-	NUMBER       = INTEGER + `(\.[0-9]+)?([eE][+-]?[0-9]+)?`
-	BOOLEAN      = `(true|false)`
-	NULL         = `null`
-	WHITESPACE   = `\s*`
-	DATE_TIME    = `"(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]{3})?(Z)?"`
-	DATE         = `"(?:\d{4})-(?:0[1-9]|1[0-2])-(?:0[1-9]|[1-2][0-9]|3[0-1])"`
-	TIME         = `"(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z)?"`
-	UUID         = `"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"`
+	JSONSchemaRegExpStringInner = `[^"\\]*(?:\\.[^"\\]*)*`
+	JSONSchemaRegExpString      = `"` + JSONSchemaRegExpStringInner + `"`
+	JSONSchemaRegExpInteger     = `(-)?(0|[1-9][0-9]*)`
+	JSONSchemaRegExpNumber      = JSONSchemaRegExpInteger + `(\.[0-9]+)?([eE][+-]?[0-9]+)?`
+	JSONSchemaRegExpBoolean     = `(true|false)`
+	JSONSchemaRegExpNull        = `null`
+	JSONSchemaRegExpWhitespace  = `\s*`
+	JSONSchemaRegExpDateTime    = `"(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]{3})?(Z)?"`
+	JSONSchemaRegExpDate        = `"(?:\d{4})-(?:0[1-9]|1[0-2])-(?:0[1-9]|[1-2][0-9]|3[0-1])"`
+	JSONSchemaRegExpTime        = `"(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z)?"`
+	JSONSchemaRegExpUUID        = `"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"`
 )
 
-var typeToRegex = map[string]string{
-	"string":  STRING,
-	"integer": INTEGER,
-	"number":  NUMBER,
-	"boolean": BOOLEAN,
-	"null":    NULL,
+var TypeToRegexMap = map[string]string{
+	"string":  JSONSchemaRegExpString,
+	"integer": JSONSchemaRegExpInteger,
+	"number":  JSONSchemaRegExpNumber,
+	"boolean": JSONSchemaRegExpBoolean,
+	"null":    JSONSchemaRegExpNull,
 }
 
-var formatToRegex = map[string]string{
-	"uuid":      UUID,
-	"date-time": DATE_TIME,
-	"date":      DATE,
-	"time":      TIME,
-}
-
-func BuildRegexFromSchemaString(schema string, whitespacePattern string) (string, error) {
-	s, err := jsonschema.CompileString("schema.json", schema)
-	if err != nil {
-		return "", err
-	}
-
-	regexp, err := BuildRegexFromSchema(s, whitespacePattern)
-	if err != nil {
-		return "", err
-	}
-
-	return regexp, nil
-}
-
-func BuildRegexFromSchema(schema *jsonschema.Schema, whitespacePattern string) (string, error) {
-	if whitespacePattern == "" {
-		whitespacePattern = WHITESPACE
-	}
-
-	innerRegex, err := toRegex(schema, whitespacePattern, schema)
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("%s%s%s", WHITESPACE, innerRegex, WHITESPACE), nil
-}
-
-func toRegex(instance *jsonschema.Schema, whitespacePattern string, rootSchema *jsonschema.Schema) (string, error) {
-	switch {
-	case instance.Properties != nil:
-		return handleProperties(instance.Properties, instance, whitespacePattern, rootSchema)
-	case len(instance.AllOf) > 0:
-		return handleAllOf(instance.AllOf, whitespacePattern, rootSchema)
-	case len(instance.AnyOf) > 0:
-		return handleAnyOf(instance.AnyOf, whitespacePattern, rootSchema)
-	case len(instance.OneOf) > 0:
-		return handleOneOf(instance.OneOf, whitespacePattern, rootSchema)
-	case instance.PrefixItems != nil:
-		return handlePrefixItems(instance.PrefixItems, instance, whitespacePattern, rootSchema)
-	case instance.Enum != nil:
-		return handleEnum(instance.Enum)
-	case instance.Constant != nil:
-		return handleConst(instance.Constant)
-	case instance.Ref != nil:
-		// return handleRef(instance.Ref, rootSchema, whitespacePattern)
-	case len(instance.Types) > 0:
-		return handleType(instance, whitespacePattern, rootSchema)
-	case len(instance.Types) == 0:
-		return handleEmptySchema(whitespacePattern, rootSchema)
-	}
-
-	return "", fmt.Errorf("unsupported schema type")
+var FormatToRegexMap = map[string]string{
+	"uuid":      JSONSchemaRegExpUUID,
+	"date-time": JSONSchemaRegExpDateTime,
+	"date":      JSONSchemaRegExpDate,
+	"time":      JSONSchemaRegExpTime,
 }
 
 func handleEmptySchema(whitespacePattern string, rootSchema *jsonschema.Schema) (string, error) {
@@ -101,7 +47,7 @@ func handleEmptySchema(whitespacePattern string, rootSchema *jsonschema.Schema) 
 	for i, t := range types {
 		schema := &jsonschema.Schema{Types: []string{t}}
 
-		regex, err := toRegex(schema, whitespacePattern, rootSchema)
+		regex, err := ToRegex(schema, whitespacePattern, rootSchema)
 		if err != nil {
 			return "", err
 		}
@@ -136,7 +82,7 @@ func handleProperties(properties map[string]*jsonschema.Schema, instance *jsonsc
 		value := properties[name]
 		subRegex := fmt.Sprintf(`%s"%s"%s:%s`, whitespacePattern, regexp.QuoteMeta(name), whitespacePattern, whitespacePattern)
 
-		valueRegex, err := toRegex(value, whitespacePattern, rootSchema)
+		valueRegex, err := ToRegex(value, whitespacePattern, rootSchema)
 		if err != nil {
 			return "", err
 		}
@@ -173,7 +119,7 @@ func handleOneOf(oneOf []*jsonschema.Schema, whitespacePattern string, rootSchem
 	subRegExps := make([]string, len(oneOf))
 
 	for i, schema := range oneOf {
-		subRegex, err := toRegex(schema, whitespacePattern, rootSchema)
+		subRegex, err := ToRegex(schema, whitespacePattern, rootSchema)
 		if err != nil {
 			return "", err
 		}
@@ -198,7 +144,7 @@ func handleAllOf(allOf []*jsonschema.Schema, whitespacePattern string, rootSchem
 	propertyRegExps := make([]string, 0)
 
 	for key, value := range mergedProperties {
-		propertyRegex, err := toRegex(value, whitespacePattern, rootSchema)
+		propertyRegex, err := ToRegex(value, whitespacePattern, rootSchema)
 		if err != nil {
 			return "", err
 		}
@@ -222,7 +168,7 @@ func handleAnyOf(anyOf []*jsonschema.Schema, whitespacePattern string, rootSchem
 	var err error
 
 	for i, schema := range anyOf {
-		subRegExps[i], err = toRegex(schema, whitespacePattern, rootSchema)
+		subRegExps[i], err = ToRegex(schema, whitespacePattern, rootSchema)
 		if err != nil {
 			return "", err
 		}
@@ -280,7 +226,7 @@ func handlePrefixItems(prefixItems []*jsonschema.Schema, instance *jsonschema.Sc
 	elementPatterns := make([]string, len(prefixItems))
 
 	for i, item := range prefixItems {
-		pattern, err := toRegex(item, whitespacePattern, rootSchema)
+		pattern, err := ToRegex(item, whitespacePattern, rootSchema)
 		if err != nil {
 			return "", err
 		}
@@ -292,7 +238,7 @@ func handlePrefixItems(prefixItems []*jsonschema.Schema, instance *jsonschema.Sc
 	regex := fmt.Sprintf("\\[%s%s", whitespacePattern, tupleInner)
 
 	if items, ok := instance.Items.(*jsonschema.Schema); ok {
-		additionalItemsRegex, err := toRegex(items, whitespacePattern, rootSchema)
+		additionalItemsRegex, err := ToRegex(items, whitespacePattern, rootSchema)
 		if err != nil {
 			return "", err
 		}
@@ -364,9 +310,9 @@ func handleType(instance *jsonschema.Schema, whitespacePattern string, rootSchem
 	case lo.Contains(instance.Types, "object"):
 		return handleObjectType(instance, whitespacePattern, rootSchema)
 	case lo.Contains(instance.Types, "boolean"):
-		return typeToRegex["boolean"], nil
+		return TypeToRegexMap["boolean"], nil
 	case lo.Contains(instance.Types, "null"):
-		return typeToRegex["null"], nil
+		return TypeToRegexMap["null"], nil
 	case len(instance.Types) > 1:
 		return handleMultipleTypes(lo.Map(instance.Types, func(item string, _ int) any {
 			return item
@@ -383,9 +329,9 @@ func handleStringType(instance *jsonschema.Schema, _ string) (string, error) {
 			minLength = instance.MinLength
 		}
 
-		return fmt.Sprintf(`"%s{%d,%d}"`, STRING_INNER, minLength, instance.MaxLength), nil
+		return fmt.Sprintf(`"%s{%d,%d}"`, JSONSchemaRegExpStringInner, minLength, instance.MaxLength), nil
 	} else if instance.MinLength > 0 {
-		return fmt.Sprintf(`"%s{%d,}"`, STRING_INNER, instance.MinLength), nil
+		return fmt.Sprintf(`"%s{%d,}"`, JSONSchemaRegExpStringInner, instance.MinLength), nil
 	} else if instance.Pattern != nil {
 		pattern := instance.Pattern.String()
 		if len(pattern) >= 2 && pattern[0] == '^' && pattern[len(pattern)-1] == '$' {
@@ -394,7 +340,7 @@ func handleStringType(instance *jsonschema.Schema, _ string) (string, error) {
 
 		return fmt.Sprintf(`("%s")`, pattern), nil
 	} else if instance.Format != "" {
-		if regex, ok := formatToRegex[instance.Format]; ok {
+		if regex, ok := FormatToRegexMap[instance.Format]; ok {
 			return regex, nil
 		}
 
@@ -402,14 +348,14 @@ func handleStringType(instance *jsonschema.Schema, _ string) (string, error) {
 	}
 
 	// Default case: any string
-	return STRING, nil
+	return JSONSchemaRegExpString, nil
 }
 func handleNumberType(instance *jsonschema.Schema) (string, error) {
 	if lo.Contains(instance.Types, "integer") {
-		return typeToRegex["integer"], nil
+		return TypeToRegexMap["integer"], nil
 	}
 
-	return typeToRegex["number"], nil
+	return TypeToRegexMap["number"], nil
 }
 
 func handleArrayType(instance *jsonschema.Schema, whitespacePattern string, rootSchema *jsonschema.Schema) (string, error) {
@@ -417,7 +363,7 @@ func handleArrayType(instance *jsonschema.Schema, whitespacePattern string, root
 		return `\[\s*([^,\]]*\s*,?\s*)*\s*\]`, nil
 	}
 
-	itemsRegex, err := toRegex(instance.Items2020, whitespacePattern, rootSchema)
+	itemsRegex, err := ToRegex(instance.Items2020, whitespacePattern, rootSchema)
 	if err != nil {
 		return "", err
 	}
@@ -454,7 +400,7 @@ func handleObjectType(instance *jsonschema.Schema, whitespacePattern string, roo
 	for _, name := range propertyNames {
 		schema := instance.Properties[name]
 
-		propertyRegex, err := toRegex(schema, whitespacePattern, rootSchema)
+		propertyRegex, err := ToRegex(schema, whitespacePattern, rootSchema)
 		if err != nil {
 			return "", err
 		}
@@ -491,7 +437,7 @@ func handleMultipleTypes(types []interface{}, whitespacePattern string, rootSche
 	for _, t := range typesStr {
 		schema := &jsonschema.Schema{Types: []string{t}}
 
-		regex, err := toRegex(schema, whitespacePattern, rootSchema)
+		regex, err := ToRegex(schema, whitespacePattern, rootSchema)
 		if err != nil {
 			return "", err
 		}
@@ -502,6 +448,114 @@ func handleMultipleTypes(types []interface{}, whitespacePattern string, rootSche
 	return fmt.Sprintf("(%s)", strings.Join(regExps, "|")), nil
 }
 
+// Translate a JSON Schema instance into a regex that validates the schema.
+// Many features of JSON schema are missing:
+// - Handle `additionalProperties` keyword
+// - Handle types defined as a list
+// - Handle constraints on numbers
+// - Handle special patterns: `date`, `uri`, etc.
+//
+// This does not support recursive definitions.
+//
+// Tweaked implementation from the original Python code to TypeScript of outlines
+// https://github.com/outlines-dev/outlines/blob/8e94488d4ee3c5a29a919d0b9e19f7ea4170b1f4/outlines/fsm/json_schema.py#L142
+func ToRegex(instance *jsonschema.Schema, whitespacePattern string, rootSchema *jsonschema.Schema) (string, error) {
+	switch {
+	case instance.Properties != nil:
+		return handleProperties(instance.Properties, instance, whitespacePattern, rootSchema)
+	case len(instance.AllOf) > 0:
+		return handleAllOf(instance.AllOf, whitespacePattern, rootSchema)
+	case len(instance.AnyOf) > 0:
+		return handleAnyOf(instance.AnyOf, whitespacePattern, rootSchema)
+	case len(instance.OneOf) > 0:
+		return handleOneOf(instance.OneOf, whitespacePattern, rootSchema)
+	case instance.PrefixItems != nil:
+		return handlePrefixItems(instance.PrefixItems, instance, whitespacePattern, rootSchema)
+	case instance.Enum != nil:
+		return handleEnum(instance.Enum)
+	case instance.Constant != nil:
+		return handleConst(instance.Constant)
+	case instance.Ref != nil:
+		// return handleRef(instance.Ref, rootSchema, whitespacePattern)
+	case len(instance.Types) > 0:
+		return handleType(instance, whitespacePattern, rootSchema)
+	case len(instance.Types) == 0:
+		return handleEmptySchema(whitespacePattern, rootSchema)
+	}
+
+	return "", fmt.Errorf("unsupported schema type")
+}
+
+// Turn a plain text JSON schema into a regex that matches any JSON object that follows
+// this schema.
+//
+// It works the same as {@link buildRegexFromSchema} but takes a string instead of an object.
+//
+// JSON Schema is a declarative language that allows to annotate JSON documents
+// with types and descriptions. These schemas can be generated from any TypeScript
+// JSON Schema tools, but not only limited to TypeScript, for example, an OpenAPI
+// spec would do so and fit in the JSON schema's world, so does the Kubernetes CRD
+// spec, as well as gRPC, tRPC, GraphQL, and many other API specs.
+//
+// And by ensuring that the generation respects the schema we ensure
+// that the output can be parsed into these objects.
+// This function parses the provided schema and builds a generation schedule which
+// mixes deterministic generation (fixed strings), and sampling with constraints.
+//
+// References - [JSON Schema](https://json-schema.org/)
+//
+// Tweaked implementation from the original Python code to TypeScript of outlines
+// https://github.com/outlines-dev/outlines/blob/8e94488d4ee3c5a29a919d0b9e19f7ea4170b1f4/outlines/fsm/json_schema.py#L44
+func BuildRegexFromSchemaString(schema string, whitespacePattern string) (string, error) {
+	s, err := jsonschema.CompileString("schema.json", schema)
+	if err != nil {
+		return "", err
+	}
+
+	regexp, err := BuildRegexFromSchema(s, whitespacePattern)
+	if err != nil {
+		return "", err
+	}
+
+	return regexp, nil
+}
+
+// Turn a JSON schema object into a regex that matches any JSON object that follows
+// this schema.
+// It works the same as {@link buildRegexFromSchemaString} but takes a JSON object instead of a string.
+//
+// JSON Schema is a declarative language that allows to annotate JSON documents
+// with types and descriptions. These schemas can be generated from any TypeScript
+// JSON Schema tools, but not only limited to TypeScript, for example, an OpenAPI
+// spec would do so and fit in the JSON schema's world, so does the Kubernetes CRD
+// spec, as well as gRPC, tRPC, GraphQL, and many other API specs.
+//
+// And by ensuring that the generation respects the schema we ensure
+// that the output can be parsed into these objects.
+// This function parses the provided schema and builds a generation schedule which
+// mixes deterministic generation (fixed strings), and sampling with constraints.
+//
+// References - [JSON Schema](https://json-schema.org/)
+//
+// Tweaked implementation from the original Python code to TypeScript of outlines
+// https://github.com/outlines-dev/outlines/blob/8e94488d4ee3c5a29a919d0b9e19f7ea4170b1f4/outlines/fsm/json_schema.py#L44
+func BuildRegexFromSchema(schema *jsonschema.Schema, whitespacePattern string) (string, error) {
+	if whitespacePattern == "" {
+		whitespacePattern = JSONSchemaRegExpWhitespace
+	}
+
+	innerRegex, err := ToRegex(schema, whitespacePattern, schema)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s%s%s", JSONSchemaRegExpWhitespace, innerRegex, JSONSchemaRegExpWhitespace), nil
+}
+
+// Extracts the JSON object in plain text from a string that matches the provided schema.
+//
+// This function extracts the JSON object from a string that matches the provided schema.
+// It uses the regular expression generated by BuildRegexFromSchema.
 func ExtractBySchema(schema *jsonschema.Schema, extractFrom string) (string, error) {
 	regex, err := BuildRegexFromSchema(schema, "")
 	if err != nil {
@@ -521,6 +575,10 @@ func ExtractBySchema(schema *jsonschema.Schema, extractFrom string) (string, err
 	return strings.TrimSpace(match), nil
 }
 
+// Extracts a satisfied struct, or type from a string that matches the provided schema.
+//
+// This function extracts the JSON object from a string that matches the provided schema.
+// It uses the regular expression generated by BuildRegexFromSchema.
 func ExtractStructBySchema[T any](schema *jsonschema.Schema, extractFrom string) (*T, error) {
 	extracted, err := ExtractBySchema(schema, extractFrom)
 	if err != nil {
