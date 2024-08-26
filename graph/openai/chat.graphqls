@@ -112,9 +112,9 @@ type ChatCompletionContentPartImageURL {
 }
 
 enum ImageDetail {
-  auto
-  low
-  high
+  Auto
+  Low
+  High
 }
 
 type ChatCompletionArrayContent {
@@ -292,22 +292,22 @@ type TopLogProb {
 }
 
 enum FinishReason {
-  STOP
-  LENGTH
-  TOOL_CALLS
-  CONTENT_FILTER
-  FUNCTION_CALL
+  Stop
+  Length
+  ToolCalls
+  ContentFilter
+  FunctionCall
 }
 
 enum ServiceTier {
   """
   the system will utilize scale tier credits until they are exhausted.
   """
-  AUTO
+  Scale
   """
   the request will be processed using the default service tier with a lower uptime SLA and no latency guarantee.
   """
-  DEFAULT
+  Default
 }
 
 input CreateChatCompletionInput {
@@ -414,7 +414,7 @@ input CreateChatCompletionInput {
   When this parameter is set, the response body will include the `service_tier`
   utilized.
   """
-  serviceTier: CreateChatCompletionServiceTier
+  serviceTier: ServiceTier
   """
   Up to 4 sequences where the API will stop generating further tokens.
   """
@@ -565,9 +565,9 @@ input CreateChatCompletionStreamOptions {
 }
 
 enum ChatCompletionToolChoiceOption {
-  none
-  auto
-  required
+  None
+  Auto
+  Required
 }
 
 input ChatCompletionTool {
@@ -607,11 +607,6 @@ input ChatCompletionToolFunction {
   Omitting `parameters` defines a function with an empty parameter list.
   """
   parameters: Map
-}
-
-enum CreateChatCompletionServiceTier {
-  auto
-  default
 }
 
 type ChatCompletionStreamResult {

@@ -24,7 +24,7 @@
 ## Protocols
 
 - [x] GraphQL
-- [ ] gRPC
+- [x] gRPC
 - [ ] WebSockets
 - [ ] RESTful
 

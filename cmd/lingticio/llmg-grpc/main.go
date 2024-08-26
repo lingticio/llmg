@@ -10,7 +10,7 @@ import (
 	"github.com/lingticio/llmg/internal/configs"
 	"github.com/lingticio/llmg/internal/datastore"
 	grpcservers "github.com/lingticio/llmg/internal/grpc/servers"
-	apiserver "github.com/lingticio/llmg/internal/grpc/servers/apiserver"
+	v1 "github.com/lingticio/llmg/internal/grpc/servers/llmg/v1"
 	grpcservices "github.com/lingticio/llmg/internal/grpc/services"
 	"github.com/lingticio/llmg/internal/libs"
 	"github.com/spf13/cobra"
@@ -31,8 +31,7 @@ func main() {
 				fx.Options(datastore.Modules()),
 				fx.Options(grpcservers.Modules()),
 				fx.Options(grpcservices.Modules()),
-				fx.Invoke(apiserver.RunGRPCServer()),
-				fx.Invoke(apiserver.RunGatewayServer()),
+				fx.Invoke(v1.Run()),
 			)
 
 			app.Run()
