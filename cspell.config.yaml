@@ -20,6 +20,8 @@ words:
   - grpcservers
   - grpcservices
   - jsonapi
+  - jsonfmt
+  - jsonschema
   - jwtclaim
   - labstack
   - lingtic
@@ -41,6 +43,7 @@ words:
   - Rueidis
   - rueidisstore
   - samber
+  - santhosh-tekuri
   - sashabaranov
   - serverv1
   - Supabase

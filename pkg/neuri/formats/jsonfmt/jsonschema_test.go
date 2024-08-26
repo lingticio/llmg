@@ -1,4 +1,4 @@
-package jsonschema
+package jsonfmt
 
 import (
 	"encoding/json"
@@ -461,6 +461,26 @@ func TestExtractBySchema(t *testing.T) {
 
 		input := `Sure, here's the JSON: {"age":30,"name":"John"}`
 		extracted, err := ExtractBySchema(schema, input)
+		require.NoError(t, err)
+		assert.Equal(t, `{"age":30,"name":"John"}`, extracted)
+	})
+}
+
+func TestExtractBySchemaWithParser(t *testing.T) {
+	t.Run("extracts object properties", func(t *testing.T) {
+		schemaMap := map[string]any{
+			"type": "object",
+			"properties": map[string]any{
+				"name": map[string]any{"type": "string"},
+				"age":  map[string]any{"type": "number"},
+			},
+		}
+
+		schema, err := jsonschema.CompileString("schema.json", toJSONString(schemaMap))
+		require.NoError(t, err)
+
+		input := `Sure, here's the JSON: {"name":"John","age":30}`
+		extracted, err := ExtractBySchemaWithParser(schema, input)
 		require.NoError(t, err)
 		assert.Equal(t, `{"age":30,"name":"John"}`, extracted)
 	})

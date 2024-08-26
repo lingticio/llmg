@@ -1,4 +1,4 @@
-package jsonschema
+package jsonfmt
 
 import (
 	"encoding/json"
@@ -12,32 +12,32 @@ import (
 )
 
 const (
-	JSONSchemaRegExpStringInner = `[^"\\]*(?:\\.[^"\\]*)*`
-	JSONSchemaRegExpString      = `"` + JSONSchemaRegExpStringInner + `"`
-	JSONSchemaRegExpInteger     = `(-)?(0|[1-9][0-9]*)`
-	JSONSchemaRegExpNumber      = JSONSchemaRegExpInteger + `(\.[0-9]+)?([eE][+-]?[0-9]+)?`
-	JSONSchemaRegExpBoolean     = `(true|false)`
-	JSONSchemaRegExpNull        = `null`
-	JSONSchemaRegExpWhitespace  = `\s*`
-	JSONSchemaRegExpDateTime    = `"(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]{3})?(Z)?"`
-	JSONSchemaRegExpDate        = `"(?:\d{4})-(?:0[1-9]|1[0-2])-(?:0[1-9]|[1-2][0-9]|3[0-1])"`
-	JSONSchemaRegExpTime        = `"(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z)?"`
-	JSONSchemaRegExpUUID        = `"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"`
+	jsonSchemaRegExpStringInner = `[^"\\]*(?:\\.[^"\\]*)*`
+	jsonSchemaRegExpString      = `"` + jsonSchemaRegExpStringInner + `"`
+	jsonSchemaRegExpInteger     = `(-)?(0|[1-9][0-9]*)`
+	jsonSchemaRegExpNumber      = jsonSchemaRegExpInteger + `(\.[0-9]+)?([eE][+-]?[0-9]+)?`
+	jsonSchemaRegExpBoolean     = `(true|false)`
+	jsonSchemaRegExpNull        = `null`
+	jsonSchemaRegExpWhitespace  = `\s*`
+	jsonSchemaRegExpDateTime    = `"(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]{3})?(Z)?"`
+	jsonSchemaRegExpDate        = `"(?:\d{4})-(?:0[1-9]|1[0-2])-(?:0[1-9]|[1-2][0-9]|3[0-1])"`
+	jsonSchemaRegExpTime        = `"(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z)?"`
+	jsonSchemaRegExpUUID        = `"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"`
 )
 
-var TypeToRegexMap = map[string]string{
-	"string":  JSONSchemaRegExpString,
-	"integer": JSONSchemaRegExpInteger,
-	"number":  JSONSchemaRegExpNumber,
-	"boolean": JSONSchemaRegExpBoolean,
-	"null":    JSONSchemaRegExpNull,
+var typeToRegexMap = map[string]string{
+	"string":  jsonSchemaRegExpString,
+	"integer": jsonSchemaRegExpInteger,
+	"number":  jsonSchemaRegExpNumber,
+	"boolean": jsonSchemaRegExpBoolean,
+	"null":    jsonSchemaRegExpNull,
 }
 
-var FormatToRegexMap = map[string]string{
-	"uuid":      JSONSchemaRegExpUUID,
-	"date-time": JSONSchemaRegExpDateTime,
-	"date":      JSONSchemaRegExpDate,
-	"time":      JSONSchemaRegExpTime,
+var formatToRegexMap = map[string]string{
+	"uuid":      jsonSchemaRegExpUUID,
+	"date-time": jsonSchemaRegExpDateTime,
+	"date":      jsonSchemaRegExpDate,
+	"time":      jsonSchemaRegExpTime,
 }
 
 func handleEmptySchema(whitespacePattern string, rootSchema *jsonschema.Schema) (string, error) {
@@ -310,9 +310,9 @@ func handleType(instance *jsonschema.Schema, whitespacePattern string, rootSchem
 	case lo.Contains(instance.Types, "object"):
 		return handleObjectType(instance, whitespacePattern, rootSchema)
 	case lo.Contains(instance.Types, "boolean"):
-		return TypeToRegexMap["boolean"], nil
+		return typeToRegexMap["boolean"], nil
 	case lo.Contains(instance.Types, "null"):
-		return TypeToRegexMap["null"], nil
+		return typeToRegexMap["null"], nil
 	case len(instance.Types) > 1:
 		return handleMultipleTypes(lo.Map(instance.Types, func(item string, _ int) any {
 			return item
@@ -329,9 +329,9 @@ func handleStringType(instance *jsonschema.Schema, _ string) (string, error) {
 			minLength = instance.MinLength
 		}
 
-		return fmt.Sprintf(`"%s{%d,%d}"`, JSONSchemaRegExpStringInner, minLength, instance.MaxLength), nil
+		return fmt.Sprintf(`"%s{%d,%d}"`, jsonSchemaRegExpStringInner, minLength, instance.MaxLength), nil
 	} else if instance.MinLength > 0 {
-		return fmt.Sprintf(`"%s{%d,}"`, JSONSchemaRegExpStringInner, instance.MinLength), nil
+		return fmt.Sprintf(`"%s{%d,}"`, jsonSchemaRegExpStringInner, instance.MinLength), nil
 	} else if instance.Pattern != nil {
 		pattern := instance.Pattern.String()
 		if len(pattern) >= 2 && pattern[0] == '^' && pattern[len(pattern)-1] == '$' {
@@ -340,7 +340,7 @@ func handleStringType(instance *jsonschema.Schema, _ string) (string, error) {
 
 		return fmt.Sprintf(`("%s")`, pattern), nil
 	} else if instance.Format != "" {
-		if regex, ok := FormatToRegexMap[instance.Format]; ok {
+		if regex, ok := formatToRegexMap[instance.Format]; ok {
 			return regex, nil
 		}
 
@@ -348,14 +348,14 @@ func handleStringType(instance *jsonschema.Schema, _ string) (string, error) {
 	}
 
 	// Default case: any string
-	return JSONSchemaRegExpString, nil
+	return jsonSchemaRegExpString, nil
 }
 func handleNumberType(instance *jsonschema.Schema) (string, error) {
 	if lo.Contains(instance.Types, "integer") {
-		return TypeToRegexMap["integer"], nil
+		return typeToRegexMap["integer"], nil
 	}
 
-	return TypeToRegexMap["number"], nil
+	return typeToRegexMap["number"], nil
 }
 
 func handleArrayType(instance *jsonschema.Schema, whitespacePattern string, rootSchema *jsonschema.Schema) (string, error) {
@@ -395,7 +395,7 @@ func handleObjectType(instance *jsonschema.Schema, whitespacePattern string, roo
 
 	sort.Strings(propertyNames)
 
-	propertyRegexes := make([]string, 0, len(propertyNames))
+	propertyRegExps := make([]string, 0, len(propertyNames))
 
 	for _, name := range propertyNames {
 		schema := instance.Properties[name]
@@ -410,10 +410,10 @@ func handleObjectType(instance *jsonschema.Schema, whitespacePattern string, roo
 			propPattern = fmt.Sprintf(`(%s)?`, propPattern)
 		}
 
-		propertyRegexes = append(propertyRegexes, propPattern)
+		propertyRegExps = append(propertyRegExps, propPattern)
 	}
 
-	propertiesRegex := strings.Join(propertyRegexes, `\s*,?\s*`)
+	propertiesRegex := strings.Join(propertyRegExps, `\s*,?\s*`)
 	objectRegex := fmt.Sprintf(`\{\s*%s\s*\}`, propertiesRegex)
 
 	if instance.AdditionalProperties != nil {
@@ -541,7 +541,7 @@ func BuildRegexFromSchemaString(schema string, whitespacePattern string) (string
 // https://github.com/outlines-dev/outlines/blob/8e94488d4ee3c5a29a919d0b9e19f7ea4170b1f4/outlines/fsm/json_schema.py#L44
 func BuildRegexFromSchema(schema *jsonschema.Schema, whitespacePattern string) (string, error) {
 	if whitespacePattern == "" {
-		whitespacePattern = JSONSchemaRegExpWhitespace
+		whitespacePattern = jsonSchemaRegExpWhitespace
 	}
 
 	innerRegex, err := ToRegex(schema, whitespacePattern, schema)
@@ -549,7 +549,7 @@ func BuildRegexFromSchema(schema *jsonschema.Schema, whitespacePattern string) (
 		return "", err
 	}
 
-	return fmt.Sprintf("%s%s%s", JSONSchemaRegExpWhitespace, innerRegex, JSONSchemaRegExpWhitespace), nil
+	return fmt.Sprintf("%s%s%s", jsonSchemaRegExpWhitespace, innerRegex, jsonSchemaRegExpWhitespace), nil
 }
 
 // Extracts the JSON object in plain text from a string that matches the provided schema.
@@ -575,12 +575,102 @@ func ExtractBySchema(schema *jsonschema.Schema, extractFrom string) (string, err
 	return strings.TrimSpace(match), nil
 }
 
+// Extracts the JSON object in plain text from a string that matches the provided schema.
+//
+// Works the same way as ExtractBySchema but uses a JSONParser to scan the JSON body out
+// of the string, this way we can use the json.Marshaller's sorted keys feature to handle
+// the random order of keys in the JSON object.
+//
+// This function extracts the JSON object from a string that matches the provided schema.
+// It uses the regular expression generated by BuildRegexFromSchema.
+func ExtractBySchemaWithParser(schema *jsonschema.Schema, extractFrom string) (string, error) {
+	regex, err := BuildRegexFromSchema(schema, "")
+	if err != nil {
+		return "", err
+	}
+
+	re, err := regexp.Compile(regex)
+	if err != nil {
+		return "", err
+	}
+
+	parser := NewJSONStreamParser()
+	allTokens := parser.Parse(extractFrom)
+	allTokens = append(allTokens, parser.End()...)
+
+	var jsonStrSorted string
+
+	jsonStr := TokensToString(allTokens)
+	if strings.HasPrefix(jsonStr, "[") {
+		var parsed []interface{}
+
+		err = json.Unmarshal([]byte(jsonStr), &parsed)
+		if err != nil {
+			return "", err
+		}
+
+		// Through re-marshal to sort the keys
+		jsonStrSortedBytes, err := json.Marshal(parsed)
+		if err != nil {
+			return "", err
+		}
+
+		jsonStrSorted = string(jsonStrSortedBytes)
+	} else if strings.HasPrefix(jsonStr, "{") {
+		var parsed map[string]interface{}
+
+		err = json.Unmarshal([]byte(jsonStr), &parsed)
+		if err != nil {
+			return "", err
+		}
+
+		// Through re-marshal to sort the keys
+		jsonStrSortedBytes, err := json.Marshal(parsed)
+		if err != nil {
+			return "", err
+		}
+
+		jsonStrSorted = string(jsonStrSortedBytes)
+	}
+
+	match := re.FindString(jsonStrSorted)
+	if match == "" {
+		return "", fmt.Errorf("no match found")
+	}
+
+	return strings.TrimSpace(match), nil
+}
+
 // Extracts a satisfied struct, or type from a string that matches the provided schema.
 //
 // This function extracts the JSON object from a string that matches the provided schema.
 // It uses the regular expression generated by BuildRegexFromSchema.
 func ExtractStructBySchema[T any](schema *jsonschema.Schema, extractFrom string) (*T, error) {
 	extracted, err := ExtractBySchema(schema, extractFrom)
+	if err != nil {
+		return nil, err
+	}
+
+	var result T
+
+	err = json.Unmarshal([]byte(extracted), &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// Extracts the JSON object in plain text from a string that matches the provided schema.
+//
+// Works the same way as ExtractStructBySchema but uses a JSONParser to scan the JSON body
+// out of the string, this way we can use the json.Marshaller's sorted keys feature to handle
+// the random order of keys in the JSON object.
+//
+// This function extracts the JSON object from a string that matches the provided schema.
+// It uses the regular expression generated by BuildRegexFromSchema.
+func ExtractStructBySchemaWithParser[T any](schema *jsonschema.Schema, extractFrom string) (*T, error) {
+	extracted, err := ExtractBySchemaWithParser(schema, extractFrom)
 	if err != nil {
 		return nil, err
 	}
