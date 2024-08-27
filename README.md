@@ -10,7 +10,12 @@
 - [ ] Semantic cache
 - [x] Structured data
   - [x] Powered by Neuri
-  - [ ] Support any order of structured data
+  - [x] JSON
+    - [x] Support any order of structured data
+    - [x] JSON streaming support
+    - [x] JSON tokenizer & parser
+  - [ ] Code snippet
+    - [ ] WASM with vscode-textmate
 - [ ] Function calling
 - [ ] Instruction mapping
 - [ ] Generative streaming
