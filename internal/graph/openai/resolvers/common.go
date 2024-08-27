@@ -50,12 +50,6 @@ func inputToRequest(input model.CreateChatCompletionInput, stream bool) openai.C
 			if item.Name != nil {
 				message.Name = *item.Name
 			}
-			if item.FunctionCall != nil {
-				message.FunctionCall = &openai.FunctionCall{
-					Name:      item.FunctionCall.Name,
-					Arguments: item.FunctionCall.Arguments,
-				}
-			}
 			if item.ToolCalls != nil {
 				message.ToolCalls = make([]openai.ToolCall, 0)
 
@@ -164,9 +158,6 @@ func inputToRequest(input model.CreateChatCompletionInput, stream bool) openai.C
 					Description: tool.Function.Description,
 					Parameters:  tool.Function.Parameters,
 				},
-			}
-			if tool.Function.Strict != nil {
-				openaiTool.Function.Strict = *tool.Function.Strict
 			}
 
 			request.Tools = append(request.Tools, openaiTool)

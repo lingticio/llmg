@@ -485,7 +485,6 @@ input ChatCompletionMessageInput {
   content: String
   multiContent: [ChatCompletionMessageContentPartInput!]
   name: String
-  functionCall: FunctionCallInput
   toolCalls: [ChatCompletionMessageToolCallInput!]
   toolCallId: String
 }
@@ -592,11 +591,6 @@ input ChatCompletionToolFunction {
   how to call the function.
   """
   description: String!
-  """
-  Whether to enable strict schema adherence when generating the output. If set to
-  true, the model will always follow the exact schema defined in the `parameters` field.
-  """
-  strict: Boolean
   """
   The parameters the functions accepts, described as a JSON Schema object. See the
   [guide](https://platform.openai.com/docs/guides/function-calling) for examples,

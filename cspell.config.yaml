@@ -34,9 +34,11 @@ words:
   - Nillable
   - nolint
   - openai
+  - openaiapiv1
   - openapi
   - openapiv2
   - openapiv3
+  - Probs
   - Protobuf
   - protocolbuffers
   - protovalidate
@@ -48,6 +50,7 @@ words:
   - serverv1
   - Supabase
   - thumbhash
+  - timestamppb
   - vektah
   - wellknowntypes
 ignoreWords: []

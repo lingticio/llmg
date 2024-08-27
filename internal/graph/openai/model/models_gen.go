@@ -110,7 +110,6 @@ type ChatCompletionMessageInput struct {
 	Content      *string                                  `json:"content,omitempty"`
 	MultiContent []*ChatCompletionMessageContentPartInput `json:"multiContent,omitempty"`
 	Name         *string                                  `json:"name,omitempty"`
-	FunctionCall *FunctionCallInput                       `json:"functionCall,omitempty"`
 	ToolCalls    []*ChatCompletionMessageToolCallInput    `json:"toolCalls,omitempty"`
 	ToolCallID   *string                                  `json:"toolCallId,omitempty"`
 }
@@ -237,9 +236,6 @@ type ChatCompletionToolFunction struct {
 	// A description of what the function does, used by the model to choose when and
 	// how to call the function.
 	Description string `json:"description"`
-	// Whether to enable strict schema adherence when generating the output. If set to
-	// true, the model will always follow the exact schema defined in the `parameters` field.
-	Strict *bool `json:"strict,omitempty"`
 	// The parameters the functions accepts, described as a JSON Schema object. See the
 	// [guide](https://platform.openai.com/docs/guides/function-calling) for examples,
 	// and the
@@ -362,7 +358,7 @@ type CreateChatCompletionInput struct {
 	//
 	// When this parameter is set, the response body will include the `service_tier`
 	// utilized.
-	ServiceTier *CreateChatCompletionServiceTier `json:"serviceTier,omitempty"`
+	ServiceTier *ServiceTier `json:"serviceTier,omitempty"`
 	// Up to 4 sequences where the API will stop generating further tokens.
 	Stop []*string `json:"stop,omitempty"`
 	// If set, partial message deltas will be sent, like in ChatGPT. Tokens will be
@@ -523,9 +519,9 @@ type Usage struct {
 type ChatCompletionToolChoiceOption string
 
 const (
-	ChatCompletionToolChoiceOptionNone     ChatCompletionToolChoiceOption = "none"
-	ChatCompletionToolChoiceOptionAuto     ChatCompletionToolChoiceOption = "auto"
-	ChatCompletionToolChoiceOptionRequired ChatCompletionToolChoiceOption = "required"
+	ChatCompletionToolChoiceOptionNone     ChatCompletionToolChoiceOption = "None"
+	ChatCompletionToolChoiceOptionAuto     ChatCompletionToolChoiceOption = "Auto"
+	ChatCompletionToolChoiceOptionRequired ChatCompletionToolChoiceOption = "Required"
 )
 
 var AllChatCompletionToolChoiceOption = []ChatCompletionToolChoiceOption{
@@ -563,55 +559,14 @@ func (e ChatCompletionToolChoiceOption) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
-type CreateChatCompletionServiceTier string
-
-const (
-	CreateChatCompletionServiceTierAuto    CreateChatCompletionServiceTier = "auto"
-	CreateChatCompletionServiceTierDefault CreateChatCompletionServiceTier = "default"
-)
-
-var AllCreateChatCompletionServiceTier = []CreateChatCompletionServiceTier{
-	CreateChatCompletionServiceTierAuto,
-	CreateChatCompletionServiceTierDefault,
-}
-
-func (e CreateChatCompletionServiceTier) IsValid() bool {
-	switch e {
-	case CreateChatCompletionServiceTierAuto, CreateChatCompletionServiceTierDefault:
-		return true
-	}
-	return false
-}
-
-func (e CreateChatCompletionServiceTier) String() string {
-	return string(e)
-}
-
-func (e *CreateChatCompletionServiceTier) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = CreateChatCompletionServiceTier(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid CreateChatCompletionServiceTier", str)
-	}
-	return nil
-}
-
-func (e CreateChatCompletionServiceTier) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
 type FinishReason string
 
 const (
-	FinishReasonStop          FinishReason = "STOP"
-	FinishReasonLength        FinishReason = "LENGTH"
-	FinishReasonToolCalls     FinishReason = "TOOL_CALLS"
-	FinishReasonContentFilter FinishReason = "CONTENT_FILTER"
-	FinishReasonFunctionCall  FinishReason = "FUNCTION_CALL"
+	FinishReasonStop          FinishReason = "Stop"
+	FinishReasonLength        FinishReason = "Length"
+	FinishReasonToolCalls     FinishReason = "ToolCalls"
+	FinishReasonContentFilter FinishReason = "ContentFilter"
+	FinishReasonFunctionCall  FinishReason = "FunctionCall"
 )
 
 var AllFinishReason = []FinishReason{
@@ -654,9 +609,9 @@ func (e FinishReason) MarshalGQL(w io.Writer) {
 type ImageDetail string
 
 const (
-	ImageDetailAuto ImageDetail = "auto"
-	ImageDetailLow  ImageDetail = "low"
-	ImageDetailHigh ImageDetail = "high"
+	ImageDetailAuto ImageDetail = "Auto"
+	ImageDetailLow  ImageDetail = "Low"
+	ImageDetailHigh ImageDetail = "High"
 )
 
 var AllImageDetail = []ImageDetail{
@@ -698,19 +653,19 @@ type ServiceTier string
 
 const (
 	// the system will utilize scale tier credits until they are exhausted.
-	ServiceTierAuto ServiceTier = "AUTO"
+	ServiceTierScale ServiceTier = "Scale"
 	// the request will be processed using the default service tier with a lower uptime SLA and no latency guarantee.
-	ServiceTierDefault ServiceTier = "DEFAULT"
+	ServiceTierDefault ServiceTier = "Default"
 )
 
 var AllServiceTier = []ServiceTier{
-	ServiceTierAuto,
+	ServiceTierScale,
 	ServiceTierDefault,
 }
 
 func (e ServiceTier) IsValid() bool {
 	switch e {
-	case ServiceTierAuto, ServiceTierDefault:
+	case ServiceTierScale, ServiceTierDefault:
 		return true
 	}
 	return false

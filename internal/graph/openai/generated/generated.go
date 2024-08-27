@@ -1091,9 +1091,9 @@ type ChatCompletionContentPartImageURL {
 }
 
 enum ImageDetail {
-  auto
-  low
-  high
+  Auto
+  Low
+  High
 }
 
 type ChatCompletionArrayContent {
@@ -1271,22 +1271,22 @@ type TopLogProb {
 }
 
 enum FinishReason {
-  STOP
-  LENGTH
-  TOOL_CALLS
-  CONTENT_FILTER
-  FUNCTION_CALL
+  Stop
+  Length
+  ToolCalls
+  ContentFilter
+  FunctionCall
 }
 
 enum ServiceTier {
   """
   the system will utilize scale tier credits until they are exhausted.
   """
-  AUTO
+  Scale
   """
   the request will be processed using the default service tier with a lower uptime SLA and no latency guarantee.
   """
-  DEFAULT
+  Default
 }
 
 input CreateChatCompletionInput {
@@ -1393,7 +1393,7 @@ input CreateChatCompletionInput {
   When this parameter is set, the response body will include the ` + "`" + `service_tier` + "`" + `
   utilized.
   """
-  serviceTier: CreateChatCompletionServiceTier
+  serviceTier: ServiceTier
   """
   Up to 4 sequences where the API will stop generating further tokens.
   """
@@ -1464,7 +1464,6 @@ input ChatCompletionMessageInput {
   content: String
   multiContent: [ChatCompletionMessageContentPartInput!]
   name: String
-  functionCall: FunctionCallInput
   toolCalls: [ChatCompletionMessageToolCallInput!]
   toolCallId: String
 }
@@ -1544,9 +1543,9 @@ input CreateChatCompletionStreamOptions {
 }
 
 enum ChatCompletionToolChoiceOption {
-  none
-  auto
-  required
+  None
+  Auto
+  Required
 }
 
 input ChatCompletionTool {
@@ -1572,11 +1571,6 @@ input ChatCompletionToolFunction {
   """
   description: String!
   """
-  Whether to enable strict schema adherence when generating the output. If set to
-  true, the model will always follow the exact schema defined in the ` + "`" + `parameters` + "`" + ` field.
-  """
-  strict: Boolean
-  """
   The parameters the functions accepts, described as a JSON Schema object. See the
   [guide](https://platform.openai.com/docs/guides/function-calling) for examples,
   and the
@@ -1586,11 +1580,6 @@ input ChatCompletionToolFunction {
   Omitting ` + "`" + `parameters` + "`" + ` defines a function with an empty parameter list.
   """
   parameters: Map
-}
-
-enum CreateChatCompletionServiceTier {
-  auto
-  default
 }
 
 type ChatCompletionStreamResult {
@@ -7658,7 +7647,7 @@ func (ec *executionContext) unmarshalInputChatCompletionMessageInput(ctx context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"role", "content", "multiContent", "name", "functionCall", "toolCalls", "toolCallId"}
+	fieldsInOrder := [...]string{"role", "content", "multiContent", "name", "toolCalls", "toolCallId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7693,13 +7682,6 @@ func (ec *executionContext) unmarshalInputChatCompletionMessageInput(ctx context
 				return it, err
 			}
 			it.Name = data
-		case "functionCall":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("functionCall"))
-			data, err := ec.unmarshalOFunctionCallInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallInput(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.FunctionCall = data
 		case "toolCalls":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("toolCalls"))
 			data, err := ec.unmarshalOChatCompletionMessageToolCallInput2ᚕᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐChatCompletionMessageToolCallInputᚄ(ctx, v)
@@ -7802,7 +7784,7 @@ func (ec *executionContext) unmarshalInputChatCompletionToolFunction(ctx context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description", "strict", "parameters"}
+	fieldsInOrder := [...]string{"name", "description", "parameters"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7823,13 +7805,6 @@ func (ec *executionContext) unmarshalInputChatCompletionToolFunction(ctx context
 				return it, err
 			}
 			it.Description = data
-		case "strict":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("strict"))
-			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Strict = data
 		case "parameters":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parameters"))
 			data, err := ec.unmarshalOMap2map(ctx, v)
@@ -7936,7 +7911,7 @@ func (ec *executionContext) unmarshalInputCreateChatCompletionInput(ctx context.
 			it.Seed = data
 		case "serviceTier":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceTier"))
-			data, err := ec.unmarshalOCreateChatCompletionServiceTier2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionServiceTier(ctx, v)
+			data, err := ec.unmarshalOServiceTier2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐServiceTier(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11048,22 +11023,6 @@ func (ec *executionContext) unmarshalOChatCompletionToolFunction2ᚖgithubᚗcom
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOCreateChatCompletionServiceTier2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionServiceTier(ctx context.Context, v interface{}) (*model.CreateChatCompletionServiceTier, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.CreateChatCompletionServiceTier)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOCreateChatCompletionServiceTier2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionServiceTier(ctx context.Context, sel ast.SelectionSet, v *model.CreateChatCompletionServiceTier) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
 func (ec *executionContext) unmarshalOCreateChatCompletionStreamOptions2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐCreateChatCompletionStreamOptions(ctx context.Context, v interface{}) (*model.CreateChatCompletionStreamOptions, error) {
 	if v == nil {
 		return nil, nil
@@ -11116,14 +11075,6 @@ func (ec *executionContext) marshalOFunctionCallChunk2ᚖgithubᚗcomᚋlingtici
 		return graphql.Null
 	}
 	return ec._FunctionCallChunk(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOFunctionCallInput2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐFunctionCallInput(ctx context.Context, v interface{}) (*model.FunctionCallInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputFunctionCallInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOImageDetail2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐImageDetail(ctx context.Context, v interface{}) (*model.ImageDetail, error) {
@@ -11195,6 +11146,22 @@ func (ec *executionContext) unmarshalOResponseFormatInput2ᚖgithubᚗcomᚋling
 	}
 	res, err := ec.unmarshalInputResponseFormatInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOServiceTier2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐServiceTier(ctx context.Context, v interface{}) (*model.ServiceTier, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ServiceTier)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOServiceTier2ᚖgithubᚗcomᚋlingticioᚋllmgᚋinternalᚋgraphᚋopenaiᚋmodelᚐServiceTier(ctx context.Context, sel ast.SelectionSet, v *model.ServiceTier) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
