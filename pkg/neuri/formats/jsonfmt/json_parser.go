@@ -33,42 +33,20 @@ type Token struct {
 }
 
 func (t *Token) stringifyObject() string {
-	var parts []string
+	parts := make([]string, 0, len(t.Children))
 
 	for _, child := range t.Children {
-		if child.Type == TokenTypeJSONField {
-			parts = append(parts, child.String())
-		}
+		parts = append(parts, child.String())
 	}
 
 	return fmt.Sprintf("{%s}", strings.Join(parts, ","))
 }
 
 func (t *Token) stringifyArray() string {
-	var parts []string
+	parts := make([]string, 0, len(t.Children))
 
 	for _, child := range t.Children {
-		switch child.Type {
-		case TokenTypeJSONObject, TokenTypeJSONArray:
-			parts = append(parts, child.String())
-		case TokenTypeJSONField:
-			// This case handles improperly nested fields in arrays
-			if len(child.Children) > 0 {
-				parts = append(parts, child.Children[0].String())
-			}
-		case TokenTypeJSONBoolean:
-			parts = append(parts, child.String())
-		case TokenTypeJSONNull:
-			parts = append(parts, child.String())
-		case TokenTypeJSONString:
-			parts = append(parts, child.String())
-		case TokenTypeJSONNumber:
-			parts = append(parts, child.String())
-		case TokenTypeText:
-			parts = append(parts, child.String())
-		default:
-			parts = append(parts, child.String())
-		}
+		parts = append(parts, child.String())
 	}
 
 	return fmt.Sprintf("[%s]", strings.Join(parts, ","))
@@ -129,17 +107,19 @@ type JSONParser struct {
 	// Cursor
 	currentToken     *Token
 	currentContainer *Token
+	containerStack   []*Token
 
 	// Tree structure
 	tree []*Token
 }
 
-func NewJSONStreamParser() *JSONParser {
+func NewJSONParser() *JSONParser {
 	return &JSONParser{
-		state:      ParserStateText,
-		stateStack: make([]ParserState, 0),
-		tree:       make([]*Token, 0),
-		pos:        Pos{Line: 1, Column: 1},
+		state:          ParserStateText,
+		stateStack:     make([]ParserState, 0),
+		pos:            Pos{Line: 1, Column: 1},
+		containerStack: make([]*Token, 0),
+		tree:           make([]*Token, 0),
 	}
 }
 
@@ -200,46 +180,26 @@ func (p *JSONParser) handleStateJSONNumber(char rune) {
 func (p *JSONParser) completeCurrentToken() {
 	value := p.buffer.String()
 	if value == "" {
-		return // Don't create a token for an empty buffer
+		// Don't create a token for an empty buffer
+		return
 	}
 
-	var tokenType TokenType
-
-	switch {
-	case p.state == ParserStateJSONString:
-		tokenType = TokenTypeJSONString
-		value = strings.Trim(value, "\"'") // Remove surrounding quotes
-	case p.state == ParserStateJSONNumber:
-		tokenType = TokenTypeJSONNumber
-		value = trimTrailingNonNumber(value)
-	case value == "true" || value == "false":
-		tokenType = TokenTypeJSONBoolean
-	case value == "null":
-		tokenType = TokenTypeJSONNull
-	default:
-		tokenType = p.determineValueType(value)
-	}
-
+	tokenType := p.determineValueType(value)
 	valueToken := &Token{Type: tokenType, Content: value, Pos: p.tokenStart}
 
-	if p.currentToken.Type == TokenTypeJSONField {
-		p.currentToken.Children = append(p.currentToken.Children, valueToken)
-	} else if p.currentContainer != nil {
-		p.currentContainer.Children = append(p.currentContainer.Children, valueToken)
+	if len(p.containerStack) > 0 {
+		currentContainer := p.containerStack[len(p.containerStack)-1]
+		if p.currentToken != nil && p.currentToken.Type == TokenTypeJSONField {
+			p.currentToken.Children = append(p.currentToken.Children, valueToken)
+		} else {
+			currentContainer.Children = append(currentContainer.Children, valueToken)
+		}
+	} else {
+		p.tree = append(p.tree, valueToken)
 	}
 
 	p.buffer.Reset()
 	p.tokenStart = p.pos
-}
-
-func trimTrailingNonNumber(s string) string {
-	for i := len(s) - 1; i >= 0; i-- {
-		if unicode.IsDigit(rune(s[i])) || s[i] == '.' || s[i] == 'e' || s[i] == 'E' || s[i] == '+' || s[i] == '-' {
-			return s[:i+1]
-		}
-	}
-
-	return s
 }
 
 func (p *JSONParser) processChar(char rune) {
@@ -286,15 +246,19 @@ func (p *JSONParser) handleStateJSONStart(char rune) {
 		p.completeCurrentToken()
 		p.depth--
 
+		if len(p.containerStack) > 0 {
+			p.containerStack = p.containerStack[:len(p.containerStack)-1]
+		}
+
 		if p.depth == 0 {
 			p.insideJSON = false
 			p.popState() // Should return to StateText
 			p.flushBuffer()
 			p.currentContainer = nil
-		} else {
-			p.popState() // Return to previous state within JSON
-			p.currentContainer = p.findParentContainer()
+		} else if len(p.containerStack) > 0 {
+			p.currentContainer = p.containerStack[len(p.containerStack)-1]
 		}
+		p.currentToken = p.currentContainer
 	case char == '{' || char == '[':
 		p.completeCurrentToken()
 		p.startNewJSONToken(char)
@@ -303,6 +267,9 @@ func (p *JSONParser) handleStateJSONStart(char rune) {
 		p.pushState(ParserStateJSONFieldValue)
 	case char == ',':
 		p.completeCurrentToken()
+		if p.currentContainer != nil && p.currentContainer.Type == TokenTypeJSONArray {
+			p.currentToken = p.currentContainer
+		}
 	case unicode.IsDigit(char) || char == '-':
 		p.pushState(ParserStateJSONNumber)
 		p.buffer.WriteRune(char)
@@ -311,8 +278,9 @@ func (p *JSONParser) handleStateJSONStart(char rune) {
 		p.buffer.WriteRune(char)
 	default:
 		if !unicode.IsSpace(char) {
-			if p.currentToken.Type == TokenTypeJSONArray {
-				p.pushState(ParserStateJSONFieldValue)
+			if p.currentContainer != nil && p.currentContainer.Type == TokenTypeJSONArray {
+				p.startNewJSONToken('{')
+				p.pushState(ParserStateJSONFieldName)
 			} else {
 				p.pushState(ParserStateJSONFieldName)
 			}
@@ -396,12 +364,19 @@ func (p *JSONParser) startNewJSONToken(char rune) {
 	}
 
 	newToken := &Token{Type: tokenType, Pos: p.pos, Children: make([]*Token, 0)}
-	if p.currentContainer != nil {
-		p.currentContainer.Children = append(p.currentContainer.Children, newToken)
+
+	if len(p.containerStack) > 0 {
+		currentContainer := p.containerStack[len(p.containerStack)-1]
+		if p.currentToken != nil && p.currentToken.Type == TokenTypeJSONField {
+			p.currentToken.Children = append(p.currentToken.Children, newToken)
+		} else {
+			currentContainer.Children = append(currentContainer.Children, newToken)
+		}
 	} else {
 		p.tree = append(p.tree, newToken)
 	}
 
+	p.containerStack = append(p.containerStack, newToken)
 	p.currentContainer = newToken
 	p.currentToken = newToken
 	p.pushState(ParserStateJSONStart)
@@ -415,34 +390,6 @@ func (p *JSONParser) startNewJSONField() {
 	p.currentContainer.Children = append(p.currentContainer.Children, newToken)
 	p.currentToken = newToken
 	p.buffer.Reset()
-}
-
-func (p *JSONParser) findParentContainer() *Token {
-	if p.currentContainer == nil {
-		return nil
-	}
-
-	var findParent func(*Token) *Token
-	findParent = func(token *Token) *Token {
-		for _, child := range token.Children {
-			if child == p.currentContainer {
-				return token
-			}
-			if result := findParent(child); result != nil {
-				return result
-			}
-		}
-
-		return nil
-	}
-
-	for _, token := range p.tree {
-		if result := findParent(token); result != nil {
-			return result
-		}
-	}
-
-	return nil
 }
 
 func (p *JSONParser) autoCloseJSON() {

@@ -594,7 +594,7 @@ func ExtractBySchemaWithParser(schema *jsonschema.Schema, extractFrom string) (s
 		return "", err
 	}
 
-	parser := NewJSONStreamParser()
+	parser := NewJSONParser()
 	allTokens := parser.Parse(extractFrom)
 	allTokens = append(allTokens, parser.End()...)
 
