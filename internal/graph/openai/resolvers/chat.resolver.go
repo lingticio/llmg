@@ -23,11 +23,19 @@ import (
 // CreateChatCompletion is the resolver for the createChatCompletion field.
 func (r *mutationResolver) CreateChatCompletion(ctx context.Context, input model.CreateChatCompletionInput) (*model.ChatCompletionResult, error) {
 	apiKey := middlewares.APIKeyFromContext(ctx)
+	if apiKey == "" {
+		if input.APIKey != nil {
+			apiKey = *input.APIKey
+		}
+	}
 
 	config := openai.DefaultConfig(apiKey)
 	baseURL := middlewares.XBaseURLFromContext(ctx)
 	if baseURL != "" {
 		config.BaseURL = baseURL
+	}
+	if input.BaseURL != nil {
+		config.BaseURL = *input.BaseURL
 	}
 
 	client := openai.NewClientWithConfig(config)
@@ -74,20 +82,17 @@ func (r *queryResolver) Models(ctx context.Context, first *int, after *string, l
 }
 
 // CreateChatCompletionStream is the resolver for the createChatCompletionStream field.
-func (r *subscriptionResolver) CreateChatCompletionStream(ctx context.Context, input model.CreateChatCompletionInput) (<-chan *model.ChatCompletionStreamResult, error) {
-	apiKey := middlewares.APIKeyFromContext(ctx)
-
-	config := openai.DefaultConfig(apiKey)
-	baseURL := middlewares.XBaseURLFromContext(ctx)
-	if baseURL != "" {
-		config.BaseURL = baseURL
+func (r *subscriptionResolver) CreateChatCompletionStream(ctx context.Context, input model.CreateChatCompletionStreamInput) (<-chan *model.ChatCompletionStreamResult, error) {
+	config := openai.DefaultConfig(input.APIKey)
+	if input.BaseURL != nil {
+		config.BaseURL = *input.BaseURL
 	}
 
 	client := openai.NewClientWithConfig(config)
 
 	ch := make(chan *model.ChatCompletionStreamResult)
 
-	stream, err := client.CreateChatCompletionStream(ctx, inputToRequest(input, true))
+	stream, err := client.CreateChatCompletionStream(ctx, streamInputToRequest(input, true))
 	if err != nil {
 		r.Logger.Error("failed to create chat completion stream", zap.Error(err))
 		return nil, err
