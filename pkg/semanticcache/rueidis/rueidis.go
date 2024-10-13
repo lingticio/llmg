@@ -161,16 +161,23 @@ func (c *SemanticCacheRueidisJSON[T]) RetrieveByVectors(ctx context.Context, vec
 
 	cmd := c.rueidis.B().
 		FtSearch().Index(c.repo.IndexName()).Query("(*)=>[KNN "+strconv.FormatInt(int64(first), 10)+" @vec $V]").
-		Return("1").Identifier("$.object").
-		Sortby("__vec_score").
+		Return("2").Identifier("$.object").Identifier("__vec_score").
+		Sortby("__vec_score").Desc().
 		Params().Nargs(2).NameValue().NameValue("V", rueidis.VectorString64(vectors)).
 		Dialect(2).
 		Build()
 
-	_, records, err := c.rueidis.Do(ctx, cmd).AsFtSearch()
+	resp := c.rueidis.Do(ctx, cmd)
+
+	_, records, err := resp.AsFtSearch()
 	if err != nil {
 		return nil, err
 	}
+
+	records = lo.Map(records, func(record rueidis.FtSearchDoc, _ int) rueidis.FtSearchDoc {
+		record.Score, _ = strconv.ParseFloat(record.Doc["__vec_score"], 64)
+		return record
+	})
 
 	return lo.Map(records, func(record rueidis.FtSearchDoc, _ int) *Retrieved[*T] {
 		var object T

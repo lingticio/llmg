@@ -2,16 +2,21 @@ package rueidis
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/lingticio/llmg/internal/datastore"
+	"github.com/nekomeowww/xo"
+	"github.com/samber/lo"
+	"github.com/sashabaranov/go-openai"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 type Example struct {
-	Title string `json:"title"` // both NewHashRepository and NewJSONRepository use json tag as field name
-	Name  string `json:"name"`
+	Query      string `json:"query"`
+	Completion string `json:"completion"`
 }
 
 func TestSemanticCache(t *testing.T) {
@@ -19,12 +24,61 @@ func TestSemanticCache(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, r)
 
-	json := RueidisJSON[Example]("my_example3", r)
+	json := RueidisJSON[Example]("chat_semantic_cache", r, WithDimension(1536))
 
-	_, err = json.CacheVectors(context.Background(), &Example{Title: "my_title", Name: "my_name"}, []float64{1, 1, 1, 1, 1, 1, 1, 1}, time.Second*5)
-	require.NoError(t, err)
+	config := openai.DefaultConfig(os.Getenv("OPENAI_API_KEY"))
+	config.BaseURL = os.Getenv("OPENAI_API_BASEURL")
 
-	retrieved, err := json.RetrieveFirstByVectors(context.Background(), []float64{1, 1, 1, 1, 1, 1, 1, 1})
-	require.NoError(t, err)
-	require.NotNil(t, retrieved)
+	openAI := openai.NewClientWithConfig(config)
+
+	// Cache
+	{
+		embedding, err := openAI.CreateEmbeddings(context.Background(), openai.EmbeddingRequestStrings{
+			Input:          []string{"When was ChatGPT released?", "Where is the headquarters of OpenAI?"},
+			Model:          openai.AdaEmbeddingV2,
+			EncodingFormat: openai.EmbeddingEncodingFormatFloat,
+		})
+		require.NoError(t, err)
+		require.Len(t, embedding.Data, 2)
+
+		ebd1 := lo.Map(embedding.Data[0].Embedding, func(item float32, _ int) float64 {
+			return float64(item)
+		})
+
+		ebd2 := lo.Map(embedding.Data[1].Embedding, func(item float32, _ int) float64 {
+			return float64(item)
+		})
+
+		_, err = json.CacheVectors(context.Background(), &Example{Query: "When was ChatGPT released?"}, ebd1, time.Hour*5)
+		require.NoError(t, err)
+
+		_, err = json.CacheVectors(context.Background(), &Example{Query: "Where is the headquarters of OpenAI?"}, ebd2, time.Hour*5)
+		require.NoError(t, err)
+	}
+
+	// Retrieve
+	{
+		embeddingQuery, err := openAI.CreateEmbeddings(context.Background(), openai.EmbeddingRequestStrings{
+			Input:          []string{"Birthday of ChatGPT?"},
+			Model:          openai.AdaEmbeddingV2,
+			EncodingFormat: openai.EmbeddingEncodingFormatFloat,
+		})
+		require.NoError(t, err)
+		require.Len(t, embeddingQuery.Data, 1)
+
+		ebdQuery := lo.Map(embeddingQuery.Data[0].Embedding, func(item float32, _ int) float64 {
+			return float64(item)
+		})
+
+		retrieved, err := json.RetrieveTop3ByVectors(context.Background(), ebdQuery)
+		require.NoError(t, err)
+		require.NotNil(t, retrieved)
+		require.Len(t, retrieved, 2)
+		require.NotZero(t, retrieved[0].Score)
+		require.NotZero(t, retrieved[1].Score)
+
+		assert.Equal(t, "When was ChatGPT released?", retrieved[0].Object.Query)
+
+		xo.PrintJSON(retrieved)
+	}
 }
