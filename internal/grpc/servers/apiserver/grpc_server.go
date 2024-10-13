@@ -11,7 +11,7 @@ import (
 
 	"github.com/lingticio/llmg/internal/configs"
 	"github.com/lingticio/llmg/internal/grpc/servers/interceptors"
-	grpcpkg "github.com/lingticio/llmg/pkg/grpc"
+	grpcpkg "github.com/lingticio/llmg/pkg/util/grpc"
 )
 
 type NewGRPCServerParams struct {

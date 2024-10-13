@@ -27,9 +27,13 @@ words:
   - lingtic
   - lingticio
   - llmg
+  - llmgapi
   - managementapi
   - managementapiv1
+  - mapstructure
+  - mitchellh
   - modelv1
+  - Nargs
   - nekomeowww
   - Nillable
   - nolint
@@ -47,7 +51,9 @@ words:
   - samber
   - santhosh-tekuri
   - sashabaranov
+  - semanticcache
   - serverv1
+  - Sortby
   - Supabase
   - thumbhash
   - timestamppb

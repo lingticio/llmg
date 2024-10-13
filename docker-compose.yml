@@ -39,6 +39,12 @@ services:
     ports:
       - 6379:6379
 
+  redis_stack_local:
+    image: redis/redis-stack-server:latest
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+
   # # promtail service that helps services to collect logs
   # # you can uncomment the following lines if you want to enable promtail
   # promtail:

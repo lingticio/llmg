@@ -41,9 +41,6 @@ func NewLogger() func(config *configs.Config) (*logger.Logger, error) {
 				Url:          os.Getenv("LOG_LOKI_REMOTE_URL"),
 				BatchMaxSize: 2000,
 				BatchMaxWait: 10 * time.Second,
-				Labels: map[string]string{
-					"env": meta.Env,
-				},
 			}, nil)),
 		)
 		if err != nil {
