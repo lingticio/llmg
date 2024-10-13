@@ -3,7 +3,9 @@ package rueidis
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/redis/rueidis"
 	"github.com/redis/rueidis/om"
@@ -44,6 +46,7 @@ type Retrieved[T any] struct {
 }
 
 type SemanticCacheRueidisJSON[T any] struct {
+	name    string
 	rueidis rueidis.Client
 	repo    om.Repository[Cached[*T]]
 	options *rueidisJSONOptions
@@ -55,6 +58,7 @@ func RueidisJSON[T any](name string, rueidis rueidis.Client, callOptions ...Ruei
 	opts := applyRueidisJSONCallOptions(&rueidisJSONOptions{}, callOptions)
 
 	return &SemanticCacheRueidisJSON[T]{
+		name:    name,
 		rueidis: rueidis,
 		repo:    om.NewJSONRepository(name, t, rueidis),
 		options: opts,
@@ -72,12 +76,22 @@ func (c *SemanticCacheRueidisJSON[T]) newCached(doc *T, vectors []float64) *Cach
 	}
 }
 
-func (c *SemanticCacheRueidisJSON[T]) CacheVectors(ctx context.Context, doc *T, vectors []float64) (*Cached[*T], error) {
+func (c *SemanticCacheRueidisJSON[T]) CacheVectors(ctx context.Context, doc *T, vectors []float64, seconds time.Duration) (*Cached[*T], error) {
 	cached := c.newCached(doc, vectors)
 
 	err := c.repo.Save(ctx, cached)
 	if err != nil {
 		return nil, err
+	}
+
+	secondsNum := int64(seconds.Seconds())
+	if seconds >= 1 {
+		cmd := c.rueidis.B().Expire().Key(fmt.Sprintf("%s:%s", c.name, cached.Key)).Seconds(secondsNum).Build()
+
+		err = c.rueidis.Do(ctx, cmd).Error()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return cached, nil
@@ -119,14 +133,34 @@ func (c *SemanticCacheRueidisJSON[T]) ensureIndex(ctx context.Context, dimension
 	return c.createIndex(ctx, dimension)
 }
 
-func (c *SemanticCacheRueidisJSON[T]) RetrieveVectors(ctx context.Context, vectors []float64) ([]*Retrieved[*T], error) {
+func (c *SemanticCacheRueidisJSON[T]) RetrieveTop3ByVectors(ctx context.Context, vectors []float64) ([]*Retrieved[*T], error) {
+	return c.RetrieveByVectors(ctx, vectors, 3)
+}
+
+func (c *SemanticCacheRueidisJSON[T]) RetrieveTop10ByVectors(ctx context.Context, vectors []float64) ([]*Retrieved[*T], error) {
+	return c.RetrieveByVectors(ctx, vectors, 10)
+}
+
+func (c *SemanticCacheRueidisJSON[T]) RetrieveFirstByVectors(ctx context.Context, vectors []float64) (*Retrieved[*T], error) {
+	retrieved, err := c.RetrieveByVectors(ctx, vectors, 1)
+	if err != nil {
+		return nil, err
+	}
+	if len(retrieved) == 0 {
+		return nil, nil
+	}
+
+	return retrieved[0], nil
+}
+
+func (c *SemanticCacheRueidisJSON[T]) RetrieveByVectors(ctx context.Context, vectors []float64, first int) ([]*Retrieved[*T], error) {
 	err := c.ensureIndex(ctx, len(vectors))
 	if err != nil {
 		return nil, err
 	}
 
 	cmd := c.rueidis.B().
-		FtSearch().Index(c.repo.IndexName()).Query("(*)=>[KNN 3 @vec $V]").
+		FtSearch().Index(c.repo.IndexName()).Query("(*)=>[KNN "+strconv.FormatInt(int64(first), 10)+" @vec $V]").
 		Return("1").Identifier("$.object").
 		Sortby("__vec_score").
 		Params().Nargs(2).NameValue().NameValue("V", rueidis.VectorString64(vectors)).

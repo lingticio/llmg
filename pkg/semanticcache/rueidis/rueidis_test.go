@@ -3,9 +3,9 @@ package rueidis
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/lingticio/llmg/internal/datastore"
-	"github.com/nekomeowww/xo"
 	"github.com/stretchr/testify/require"
 )
 
@@ -21,12 +21,10 @@ func TestSemanticCache(t *testing.T) {
 
 	json := RueidisJSON[Example]("my_example3", r)
 
-	_, err = json.CacheVectors(context.Background(), &Example{Title: "my_title", Name: "my_name"}, []float64{1, 1, 1, 1, 1, 1, 1, 1})
+	_, err = json.CacheVectors(context.Background(), &Example{Title: "my_title", Name: "my_name"}, []float64{1, 1, 1, 1, 1, 1, 1, 1}, time.Second*5)
 	require.NoError(t, err)
 
-	records, err := json.RetrieveVectors(context.Background(), []float64{1, 1, 1, 1, 1, 1, 1, 1})
+	retrieved, err := json.RetrieveFirstByVectors(context.Background(), []float64{1, 1, 1, 1, 1, 1, 1, 1})
 	require.NoError(t, err)
-	require.NotNil(t, records)
-
-	xo.PrintJSON(records)
+	require.NotNil(t, retrieved)
 }
