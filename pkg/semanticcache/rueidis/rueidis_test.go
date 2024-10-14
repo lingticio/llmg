@@ -49,17 +49,17 @@ func TestSemanticCache(t *testing.T) {
 			return float64(item)
 		})
 
-		_, err = json.CacheVectors(context.Background(), &Example{Query: "When was ChatGPT released?"}, ebd1, time.Hour*5)
+		_, err = json.CacheVectors(context.Background(), &Example{Query: "Birthday of ChatGPT"}, ebd1, time.Second*2)
 		require.NoError(t, err)
 
-		_, err = json.CacheVectors(context.Background(), &Example{Query: "Where is the headquarters of OpenAI?"}, ebd2, time.Hour*5)
+		_, err = json.CacheVectors(context.Background(), &Example{Query: "Apple's headquarters"}, ebd2, time.Second*2)
 		require.NoError(t, err)
 	}
 
 	// Retrieve
 	{
 		embeddingQuery, err := openAI.CreateEmbeddings(context.Background(), openai.EmbeddingRequestStrings{
-			Input:          []string{"Birthday of ChatGPT?"},
+			Input:          []string{"When is the birthday of ChatGPT?"},
 			Model:          openai.AdaEmbeddingV2,
 			EncodingFormat: openai.EmbeddingEncodingFormatFloat,
 		})
@@ -70,14 +70,15 @@ func TestSemanticCache(t *testing.T) {
 			return float64(item)
 		})
 
-		retrieved, err := json.RetrieveTop3ByVectors(context.Background(), ebdQuery)
+		retrieved, err := json.RetrieveTop10ByVectors(context.Background(), ebdQuery)
 		require.NoError(t, err)
 		require.NotNil(t, retrieved)
 		require.Len(t, retrieved, 2)
 		require.NotZero(t, retrieved[0].Score)
 		require.NotZero(t, retrieved[1].Score)
 
-		assert.Equal(t, "When was ChatGPT released?", retrieved[0].Object.Query)
+		assert.Equal(t, "Birthday of ChatGPT", retrieved[0].Object.Query)
+		assert.Equal(t, "Apple's headquarters", retrieved[1].Object.Query)
 
 		xo.PrintJSON(retrieved)
 	}
