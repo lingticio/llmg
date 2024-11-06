@@ -61,7 +61,7 @@ func NewServer() func(params NewServerParams) *Server {
 		}
 
 		server := &http.Server{
-			Addr:              params.Config.LingticIo.LLMG.GraphQL.Addr,
+			Addr:              params.Config.GraphQL.Addr,
 			Handler:           e,
 			ReadHeaderTimeout: time.Minute,
 		}

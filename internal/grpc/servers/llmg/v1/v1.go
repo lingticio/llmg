@@ -45,7 +45,7 @@ func NewV1GRPCServer() func(params NewV1GRPCServerParam) *V1GRPCServer {
 
 		return &V1GRPCServer{
 			GRPCServer: grpcServer,
-			Addr:       params.Config.LingticIo.LLMG.Grpc.Addr,
+			Addr:       params.Config.Grpc.Addr,
 		}
 	}
 }

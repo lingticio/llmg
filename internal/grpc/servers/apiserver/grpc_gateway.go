@@ -67,11 +67,11 @@ func NewGatewayServer() func(params NewGatewayServerParams) (*GatewayServer, err
 		}
 
 		server := &GatewayServer{
-			ListenAddr:     params.Config.LingticIo.LLMG.Http.Addr,
-			GRPCServerAddr: params.Config.LingticIo.LLMG.Grpc.Addr,
+			ListenAddr:     params.Config.Http.Addr,
+			GRPCServerAddr: params.Config.Grpc.Addr,
 			echo:           e,
 			server: &http.Server{
-				Addr:              params.Config.LingticIo.LLMG.Http.Addr,
+				Addr:              params.Config.Http.Addr,
 				Handler:           e,
 				ReadHeaderTimeout: time.Duration(30) * time.Second,
 			},
@@ -79,7 +79,7 @@ func NewGatewayServer() func(params NewGatewayServerParams) (*GatewayServer, err
 
 		params.Lifecycle.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
-				conn, err := grpc.NewClient(params.Config.LingticIo.LLMG.Grpc.Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+				conn, err := grpc.NewClient(params.Config.Grpc.Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 				if err != nil {
 					return err
 				}

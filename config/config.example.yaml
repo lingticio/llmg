@@ -1,11 +1,6 @@
 env: local
 
-lingticio:
-  core:
-    api_server:
-      http:
-        server_addr: :8080
-      grpc:
-        server_addr: :8081
-
-
+http:
+  server_addr: :8080
+grpc:
+  server_addr: :8081

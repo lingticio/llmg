@@ -46,6 +46,7 @@ words:
   - Protobuf
   - protocolbuffers
   - protovalidate
+  - rediskeys
   - Rueidis
   - rueidisstore
   - samber

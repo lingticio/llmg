@@ -5,42 +5,45 @@ import (
 	"github.com/spf13/viper"
 )
 
-type LingticIoLLMGHttpServer struct {
+type HttpServer struct {
 	Addr string `json:"server_addr" yaml:"server_addr"`
 }
 
-type LingticIoLLMGGrpcServer struct {
+type GrpcServer struct {
 	Addr string `json:"server_addr" yaml:"server_addr"`
 }
 
-type LingticIoLLMGGraphQLServer struct {
+type GraphQLServer struct {
 	Addr string `json:"server_addr" yaml:"server_addr"`
 }
 
-type LingticIoLLMG struct {
-	Http    LingticIoLLMGHttpServer    `json:"http" yaml:"http"`
-	Grpc    LingticIoLLMGGrpcServer    `json:"grpc" yaml:"grpc"`
-	GraphQL LingticIoLLMGGraphQLServer `json:"graphql" yaml:"graphql"`
+type Endpoint struct {
+	ID     string `json:"id" yaml:"id"`
+	Alias  string `json:"alias" yaml:"alias"`
+	APIKey string `json:"api_key" yaml:"api_key"`
 }
 
-type LingticIo struct {
-	LLMG LingticIoLLMG `json:"core" yaml:"core"`
+type Group struct {
+	ID string `json:"id" yaml:"id"`
+
+	Groups    []Group    `json:"groups" yaml:"groups"`
+	Endpoints []Endpoint `json:"endpoints" yaml:"endpoints"`
 }
 
-func defaultLingticIoConfig() LingticIo {
-	return LingticIo{
-		LingticIoLLMG{
-			Http: LingticIoLLMGHttpServer{
-				Addr: ":8080",
-			},
-			Grpc: LingticIoLLMGGrpcServer{
-				Addr: ":8081",
-			},
-			GraphQL: LingticIoLLMGGraphQLServer{
-				Addr: ":8082",
-			},
-		},
-	}
+type Team struct {
+	ID string `json:"id" yaml:"id"`
+
+	Groups []Group `json:"groups" yaml:"groups"`
+}
+
+type Tenant struct {
+	ID string `json:"id" yaml:"id"`
+
+	Teams []Team `json:"teams" yaml:"teams"`
+}
+
+type Configs struct {
+	Tenants []Tenant `json:"tenants" yaml:"tenants"`
 }
 
 func registerLingticIoCoreConfig() {

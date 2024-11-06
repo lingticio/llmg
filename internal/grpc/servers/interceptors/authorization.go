@@ -39,3 +39,15 @@ func AuthorizationFromContext(ctx context.Context) (string, error) {
 
 	return AuthorizationFromMetadata(md)
 }
+
+func BearerFromAuthorization(authorization string) (string, error) {
+	if authorization == "" {
+		return "", nil
+	}
+
+	if len(authorization) < 7 || authorization[:7] != "Bearer " {
+		return "", apierrors.NewBadRequest().WithDetail("malformed Authorization header, expected Bearer token").AsStatus()
+	}
+
+	return authorization[7:], nil
+}

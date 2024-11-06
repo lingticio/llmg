@@ -47,7 +47,7 @@ func NewGRPCServer() func(params NewGRPCServerParams) *GRPCServer {
 		})
 
 		return &GRPCServer{
-			ListenAddr: params.Config.LingticIo.LLMG.Grpc.Addr,
+			ListenAddr: params.Config.Grpc.Addr,
 			server:     server,
 			register:   params.Register,
 		}
