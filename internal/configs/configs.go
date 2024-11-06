@@ -15,7 +15,7 @@ type Config struct {
 	Http    HttpServer    `json:"http" yaml:"http"`
 	Grpc    GrpcServer    `json:"grpc" yaml:"grpc"`
 	GraphQL GraphQLServer `json:"graphql" yaml:"graphql"`
-	Configs Configs       `json:"configs" yaml:"configs"`
+	Routes  Routes        `json:"configs" yaml:"configs"`
 }
 
 func defaultConfig() Config {

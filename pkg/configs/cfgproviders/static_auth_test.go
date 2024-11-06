@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/lingticio/llmg/internal/configs"
+	"github.com/lingticio/llmg/pkg/types/metadata"
 	"github.com/nekomeowww/xo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -19,8 +20,8 @@ func TestConfigEndpointAuthStorage_FindMetadataByAPIKey(t *testing.T) {
 	apiKey1 := xo.RandomHashString(16)
 	apiKey2 := xo.RandomHashString(16)
 
-	s := &ConfigEndpointAuthStorage{
-		Config: &configs.Configs{
+	s := &ConfigEndpointAuthProvider{
+		Config: &configs.Routes{
 			Tenants: []configs.Tenant{
 				{
 					ID: tenantID,
@@ -90,8 +91,8 @@ func TestConfigEndpointAuthStorage_FindMetadataByAlias(t *testing.T) {
 	alias1 := "test"
 	alias2 := "test-2"
 
-	s := &ConfigEndpointAuthStorage{
-		Config: &configs.Configs{
+	s := &ConfigEndpointAuthProvider{
+		Config: &configs.Routes{
 			Tenants: []configs.Tenant{
 				{
 					ID: tenantID,
@@ -150,4 +151,106 @@ func TestConfigEndpointAuthStorage_FindMetadataByAlias(t *testing.T) {
 	md, err = s.FindMetadataByAlias(context.TODO(), "invalid")
 	require.Error(t, err)
 	require.Nil(t, md)
+}
+
+func TestConfigAuthStorage_findUpstream(t *testing.T) {
+	tenantID := xo.RandomHashString(8)
+	teamID := xo.RandomHashString(8)
+	groupID := xo.RandomHashString(8)
+
+	tenantUpstream := &metadata.UpstreamSingleOrMultiple{
+		Upstream: &metadata.Upstream{
+			OpenAI: metadata.UpstreamOpenAI{
+				BaseURL: "tenant-url",
+				APIKey:  "tenant-key",
+			},
+		},
+	}
+
+	teamUpstream := &metadata.UpstreamSingleOrMultiple{
+		Upstream: &metadata.Upstream{
+			OpenAI: metadata.UpstreamOpenAI{
+				BaseURL: "team-url",
+				APIKey:  "team-key",
+			},
+		},
+	}
+
+	groupUpstream := &metadata.UpstreamSingleOrMultiple{
+		Upstream: &metadata.Upstream{
+			OpenAI: metadata.UpstreamOpenAI{
+				BaseURL: "group-url",
+				APIKey:  "group-key",
+			},
+		},
+	}
+
+	endpointUpstream := &metadata.UpstreamSingleOrMultiple{
+		Upstream: &metadata.Upstream{
+			OpenAI: metadata.UpstreamOpenAI{
+				BaseURL: "endpoint-url",
+				APIKey:  "endpoint-key",
+			},
+		},
+	}
+
+	s := &ConfigEndpointAuthProvider{
+		Config: &configs.Routes{
+			Tenants: []configs.Tenant{
+				{
+					ID:       tenantID,
+					Upstream: tenantUpstream,
+					Teams: []configs.Team{
+						{
+							ID:       teamID,
+							Upstream: teamUpstream,
+							Groups: []configs.Group{
+								{
+									ID:       groupID,
+									Upstream: groupUpstream,
+									Endpoints: []configs.Endpoint{
+										{
+											ID:       "endpoint1",
+											APIKey:   "key1",
+											Upstream: endpointUpstream,
+										},
+										{
+											ID:     "endpoint2",
+											APIKey: "key2",
+											// No upstream - should inherit from group
+										},
+									},
+								},
+								{
+									ID: "group2",
+									Endpoints: []configs.Endpoint{
+										{
+											ID:     "endpoint3",
+											APIKey: "key3",
+											// No upstream - should inherit from team
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// Test endpoint with its own upstream
+	md1, err := s.FindMetadataByAPIKey(context.TODO(), "key1")
+	require.NoError(t, err)
+	assert.Equal(t, endpointUpstream, md1.Upstream)
+
+	// Test endpoint inheriting from group
+	md2, err := s.FindMetadataByAPIKey(context.TODO(), "key2")
+	require.NoError(t, err)
+	assert.Equal(t, groupUpstream, md2.Upstream)
+
+	// Test endpoint inheriting from team
+	md3, err := s.FindMetadataByAPIKey(context.TODO(), "key3")
+	require.NoError(t, err)
+	assert.Equal(t, teamUpstream, md3.Upstream)
 }

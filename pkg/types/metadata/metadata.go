@@ -1,5 +1,19 @@
 package metadata
 
+import (
+	"net/http"
+
+	"github.com/samber/lo"
+)
+
+var _ Identifiable = (*TenantID)(nil)
+var _ Identifiable = (*TeamID)(nil)
+var _ Identifiable = (*GroupID)(nil)
+
+var _ Identifiable = (*UnimplementedTenant)(nil)
+var _ Identifiable = (*UnimplementedTeam)(nil)
+var _ Identifiable = (*UnimplementedGroup)(nil)
+
 type Identifiable interface {
 	ID() string
 }
@@ -11,8 +25,6 @@ type Tenant interface {
 func TenantFromID(id string) Tenant {
 	return TenantID{id: id}
 }
-
-var _ Tenant = (*TenantID)(nil)
 
 type TenantID struct {
 	id string
@@ -35,8 +47,6 @@ type Team interface {
 	Identifiable
 }
 
-var _ Team = (*TeamID)(nil)
-
 func TeamFromID(id string) Team {
 	return TeamID{id: id}
 }
@@ -49,8 +59,6 @@ func (t TeamID) ID() string {
 	return t.id
 }
 
-var _ Team = (*UnimplementedTeam)(nil)
-
 type UnimplementedTeam struct {
 }
 
@@ -61,8 +69,6 @@ func (t UnimplementedTeam) ID() string {
 type Group interface {
 	Identifiable
 }
-
-var _ Group = (*GroupID)(nil)
 
 type GroupID struct {
 	id string
@@ -76,8 +82,6 @@ func (g GroupID) ID() string {
 	return g.id
 }
 
-var _ Group = (*UnimplementedGroup)(nil)
-
 type UnimplementedGroup struct {
 }
 
@@ -85,13 +89,13 @@ func (g UnimplementedGroup) ID() string {
 	return ""
 }
 
+var _ Metadata = (*UnimplementedMetadata)(nil)
+
 type Metadata interface {
 	Tenant() Tenant
 	Team() Team
 	Group() Group
 }
-
-var _ Metadata = (*UnimplementedMetadata)(nil)
 
 type UnimplementedMetadata struct {
 }
@@ -106,4 +110,98 @@ func (m UnimplementedMetadata) Team() Team {
 
 func (m UnimplementedMetadata) Group() Group {
 	return UnimplementedGroup{}
+}
+
+type UpstreamOpenAICompatibleChat struct {
+	Usage  bool `json:"usage" yaml:"usage"`
+	Stream bool `json:"stream" yaml:"stream"`
+}
+
+type UpstreamOpenAICompatible struct {
+	Chat       UpstreamOpenAICompatibleChat `json:"chat" yaml:"chat"`
+	Models     bool                         `json:"models" yaml:"models"`
+	Embeddings bool                         `json:"embeddings" yaml:"embeddings"`
+	Images     bool                         `json:"images" yaml:"images"`
+	Audio      bool                         `json:"audio" yaml:"audio"`
+}
+
+type UpstreamOpenAI struct {
+	Weight *uint `json:"weight" yaml:"weight"`
+
+	BaseURL      string                   `json:"base_url" yaml:"base_url"`
+	APIKey       string                   `json:"api_key" yaml:"api_key"`
+	ExtraHeaders http.Header              `json:"extra_headers" yaml:"extra_headers"`
+	Compatible   UpstreamOpenAICompatible `json:"compatible" yaml:"compatible"`
+}
+
+var _ Upstreamable = (*Upstream)(nil)
+var _ Upstreamable = (*Upstreams)(nil)
+var _ Upstreamable = (*UpstreamSingleOrMultiple)(nil)
+
+type Upstreamable interface {
+	IsSingleUpstream() bool
+	GetUpstream() *Upstream
+	GetUpstreams() []*Upstream
+}
+
+type Upstream struct {
+	OpenAI UpstreamOpenAI `json:"openai" yaml:"openai"`
+}
+
+func (*Upstream) IsSingleUpstream() bool {
+	return true
+}
+
+func (u *Upstream) GetUpstream() *Upstream {
+	return u
+}
+
+func (u *Upstream) GetUpstreams() []*Upstream {
+	return []*Upstream{u}
+}
+
+type Upstreams []*Upstream
+
+func (Upstreams) IsSingleUpstream() bool {
+	return false
+}
+
+func (u Upstreams) GetUpstream() *Upstream {
+	if len(u) == 0 {
+		return nil
+	}
+
+	return u[0]
+}
+
+func (u Upstreams) GetUpstreams() []*Upstream {
+	return lo.Map(u, func(item *Upstream, index int) *Upstream {
+		return item
+	})
+}
+
+type UpstreamSingleOrMultiple struct {
+	*Upstream `yaml:",inline"`
+
+	Group Upstreams `json:"group" yaml:"group"`
+}
+
+func (u *UpstreamSingleOrMultiple) IsSingleUpstream() bool {
+	return len(u.Group) == 0
+}
+
+func (u *UpstreamSingleOrMultiple) GetUpstream() *Upstream {
+	if u.IsSingleUpstream() {
+		return u.Upstream
+	}
+
+	return u.Group.GetUpstream()
+}
+
+func (u *UpstreamSingleOrMultiple) GetUpstreams() []*Upstream {
+	if u.IsSingleUpstream() {
+		return []*Upstream{u.Upstream}
+	}
+
+	return u.Group.GetUpstreams()
 }

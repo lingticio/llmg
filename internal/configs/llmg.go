@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"github.com/lingticio/llmg/pkg/types/metadata"
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
 )
@@ -18,32 +19,37 @@ type GraphQLServer struct {
 }
 
 type Endpoint struct {
-	ID     string `json:"id" yaml:"id"`
-	Alias  string `json:"alias" yaml:"alias"`
-	APIKey string `json:"api_key" yaml:"api_key"`
+	ID       string                             `json:"id" yaml:"id"`
+	Alias    string                             `json:"alias" yaml:"alias"`
+	APIKey   string                             `json:"api_key" yaml:"api_key"`
+	Upstream *metadata.UpstreamSingleOrMultiple `json:"upstream,omitempty" yaml:"upstream,omitempty"`
 }
 
 type Group struct {
 	ID string `json:"id" yaml:"id"`
 
-	Groups    []Group    `json:"groups" yaml:"groups"`
-	Endpoints []Endpoint `json:"endpoints" yaml:"endpoints"`
+	Groups    []Group                            `json:"groups" yaml:"groups"`
+	Endpoints []Endpoint                         `json:"endpoints" yaml:"endpoints"`
+	Upstream  *metadata.UpstreamSingleOrMultiple `json:"upstream,omitempty" yaml:"upstream,omitempty"`
 }
 
 type Team struct {
 	ID string `json:"id" yaml:"id"`
 
-	Groups []Group `json:"groups" yaml:"groups"`
+	Groups   []Group                            `json:"groups" yaml:"groups"`
+	Upstream *metadata.UpstreamSingleOrMultiple `json:"upstream,omitempty" yaml:"upstream,omitempty"`
 }
 
 type Tenant struct {
 	ID string `json:"id" yaml:"id"`
 
-	Teams []Team `json:"teams" yaml:"teams"`
+	Teams    []Team                             `json:"teams" yaml:"teams"`
+	Upstream *metadata.UpstreamSingleOrMultiple `json:"upstream,omitempty" yaml:"upstream,omitempty"`
 }
 
-type Configs struct {
-	Tenants []Tenant `json:"tenants" yaml:"tenants"`
+type Routes struct {
+	Tenants  []Tenant                           `json:"tenants" yaml:"tenants"`
+	Upstream *metadata.UpstreamSingleOrMultiple `json:"upstream,omitempty" yaml:"upstream,omitempty"`
 }
 
 func registerLingticIoCoreConfig() {

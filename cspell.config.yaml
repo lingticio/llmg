@@ -6,6 +6,7 @@ words:
   - apierrors
   - apiserver
   - APIURL
+  - Balancable
   - bufbuild
   - coreapi
   - coreapiv1
@@ -58,6 +59,8 @@ words:
   - Supabase
   - thumbhash
   - timestamppb
+  - Upstreamable
+  - Upstreams
   - vektah
   - wellknowntypes
 ignoreWords: []
