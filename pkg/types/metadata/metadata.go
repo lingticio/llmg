@@ -6,87 +6,36 @@ import (
 	"github.com/samber/lo"
 )
 
-var _ Identifiable = (*TenantID)(nil)
-var _ Identifiable = (*TeamID)(nil)
-var _ Identifiable = (*GroupID)(nil)
-
-var _ Identifiable = (*UnimplementedTenant)(nil)
-var _ Identifiable = (*UnimplementedTeam)(nil)
-var _ Identifiable = (*UnimplementedGroup)(nil)
+var _ Identifiable = (*Tenant)(nil)
+var _ Identifiable = (*Team)(nil)
+var _ Identifiable = (*Group)(nil)
 
 type Identifiable interface {
 	ID() string
 }
 
-type Tenant interface {
-	Identifiable
+type Tenant struct {
+	Id string `json:"id" yaml:"id"`
 }
 
-func TenantFromID(id string) Tenant {
-	return TenantID{id: id}
+func (t Tenant) ID() string {
+	return t.Id
 }
 
-type TenantID struct {
-	id string
+type Team struct {
+	Id string `json:"id" yaml:"id"`
 }
 
-func (t TenantID) ID() string {
-	return t.id
+func (t Team) ID() string {
+	return t.Id
 }
 
-var _ Tenant = (*UnimplementedTenant)(nil)
-
-type UnimplementedTenant struct {
+type Group struct {
+	Id string `json:"id" yaml:"id"`
 }
 
-func (t UnimplementedTenant) ID() string {
-	return ""
-}
-
-type Team interface {
-	Identifiable
-}
-
-func TeamFromID(id string) Team {
-	return TeamID{id: id}
-}
-
-type TeamID struct {
-	id string
-}
-
-func (t TeamID) ID() string {
-	return t.id
-}
-
-type UnimplementedTeam struct {
-}
-
-func (t UnimplementedTeam) ID() string {
-	return ""
-}
-
-type Group interface {
-	Identifiable
-}
-
-type GroupID struct {
-	id string
-}
-
-func GroupFromID(id string) Group {
-	return GroupID{id: id}
-}
-
-func (g GroupID) ID() string {
-	return g.id
-}
-
-type UnimplementedGroup struct {
-}
-
-func (g UnimplementedGroup) ID() string {
-	return ""
+func (g Group) ID() string {
+	return g.Id
 }
 
 var _ Metadata = (*UnimplementedMetadata)(nil)
@@ -101,15 +50,15 @@ type UnimplementedMetadata struct {
 }
 
 func (m UnimplementedMetadata) Tenant() Tenant {
-	return UnimplementedTenant{}
+	return Tenant{}
 }
 
 func (m UnimplementedMetadata) Team() Team {
-	return UnimplementedTeam{}
+	return Team{}
 }
 
 func (m UnimplementedMetadata) Group() Group {
-	return UnimplementedGroup{}
+	return Group{}
 }
 
 type UpstreamOpenAICompatibleChat struct {

@@ -1,44 +1,6 @@
 version: "3.9"
 
 services:
-  # the default PostgreSQL database service that helps services to store data
-  # db_local:
-  #   image: postgres:alpine
-  #   restart: unless-stopped
-  #   environment:
-  #     - POSTGRES_PASSWORD=123456
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_DB=postgres
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #   ports:
-  #     - 5432:5432
-
-  # the default Redis service that helps services to store data
-  redis_local:
-    image: redis:7
-    restart: unless-stopped
-    environment:
-      - REDIS_PASSWORD=123456
-    command: >
-      /bin/sh -c "redis-server $${REDIS_PASSWORD:+--requirepass \"$$REDIS_PASSWORD\"}"
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          'redis-cli -e $${REDIS_PASSWORD:+-a "$$REDIS_PASSWORD"} --no-auth-warning ping',
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    ports:
-      - 6379:6379
-
   redis_stack_local:
     image: redis/redis-stack-server:latest
     restart: unless-stopped
@@ -68,6 +30,3 @@ services:
 # networks:
 #   <loki_network>: # replace <loki_network> with your own loki network name
 #     external: true
-
-volumes:
-  postgres_data:

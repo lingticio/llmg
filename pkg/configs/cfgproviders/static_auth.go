@@ -8,13 +8,13 @@ import (
 	"github.com/lingticio/llmg/pkg/types/metadata"
 )
 
-var _ EndpointAuthProvider = (*ConfigEndpointAuthProvider)(nil)
+var _ EndpointProvider = (*ConfigEndpointProvider)(nil)
 
-type ConfigEndpointAuthProvider struct {
+type ConfigEndpointProvider struct {
 	Config *configs.Routes
 }
 
-func (s *ConfigEndpointAuthProvider) findUpstream(endpoint configs.Endpoint, group configs.Group, team configs.Team, tenant configs.Tenant) metadata.Upstreamable {
+func (s *ConfigEndpointProvider) findUpstream(endpoint configs.Endpoint, group configs.Group, team configs.Team, tenant configs.Tenant) *metadata.UpstreamSingleOrMultiple {
 	if endpoint.Upstream != nil {
 		return endpoint.Upstream
 	}
@@ -28,15 +28,15 @@ func (s *ConfigEndpointAuthProvider) findUpstream(endpoint configs.Endpoint, gro
 	return tenant.Upstream
 }
 
-func (s *ConfigEndpointAuthProvider) searchGroupsForAPIKey(tenantID, teamID string, groups []configs.Group, apiKey string, team configs.Team, tenant configs.Tenant) (*EndpointAuth, error) {
+func (s *ConfigEndpointProvider) searchGroupsForAPIKey(tenantID, teamID string, groups []configs.Group, apiKey string, team configs.Team, tenant configs.Tenant) (*Endpoint, error) {
 	for _, group := range groups {
 		// Search in current group's endpoints
 		for _, endpoint := range group.Endpoints {
 			if endpoint.APIKey == apiKey {
-				return &EndpointAuth{
-					Tenant:   metadata.TenantFromID(tenantID),
-					Team:     metadata.TeamFromID(teamID),
-					Group:    metadata.GroupFromID(group.ID),
+				return &Endpoint{
+					Tenant:   metadata.Tenant{Id: tenantID},
+					Team:     metadata.Team{Id: teamID},
+					Group:    metadata.Group{Id: group.ID},
 					ID:       endpoint.ID,
 					Alias:    endpoint.Alias,
 					APIKey:   endpoint.APIKey,
@@ -57,7 +57,7 @@ func (s *ConfigEndpointAuthProvider) searchGroupsForAPIKey(tenantID, teamID stri
 	return nil, fmt.Errorf("api key not found")
 }
 
-func (s *ConfigEndpointAuthProvider) FindMetadataByAPIKey(ctx context.Context, apiKey string) (*EndpointAuth, error) {
+func (s *ConfigEndpointProvider) FindOneByAPIKey(ctx context.Context, apiKey string) (*Endpoint, error) {
 	for _, tenant := range s.Config.Tenants {
 		for _, team := range tenant.Teams {
 			metadata, err := s.searchGroupsForAPIKey(tenant.ID, team.ID, team.Groups, apiKey, team, tenant)
@@ -70,15 +70,15 @@ func (s *ConfigEndpointAuthProvider) FindMetadataByAPIKey(ctx context.Context, a
 	return nil, fmt.Errorf("api key not found")
 }
 
-func (s *ConfigEndpointAuthProvider) searchGroupsForAlias(tenantID, teamID string, groups []configs.Group, alias string, team configs.Team, tenant configs.Tenant) (*EndpointAuth, error) {
+func (s *ConfigEndpointProvider) searchGroupsForAlias(tenantID, teamID string, groups []configs.Group, alias string, team configs.Team, tenant configs.Tenant) (*Endpoint, error) {
 	for _, group := range groups {
 		// Search in current group's endpoints
 		for _, endpoint := range group.Endpoints {
 			if endpoint.Alias == alias {
-				return &EndpointAuth{
-					Tenant:   metadata.TenantFromID(tenantID),
-					Team:     metadata.TeamFromID(teamID),
-					Group:    metadata.GroupFromID(group.ID),
+				return &Endpoint{
+					Tenant:   metadata.Tenant{Id: tenantID},
+					Team:     metadata.Team{Id: teamID},
+					Group:    metadata.Group{Id: group.ID},
 					ID:       endpoint.ID,
 					Alias:    endpoint.Alias,
 					APIKey:   endpoint.APIKey,
@@ -99,7 +99,7 @@ func (s *ConfigEndpointAuthProvider) searchGroupsForAlias(tenantID, teamID strin
 	return nil, fmt.Errorf("alias not found")
 }
 
-func (s *ConfigEndpointAuthProvider) FindMetadataByAlias(ctx context.Context, alias string) (*EndpointAuth, error) {
+func (s *ConfigEndpointProvider) FindOneByAlias(ctx context.Context, alias string) (*Endpoint, error) {
 	for _, tenant := range s.Config.Tenants {
 		for _, team := range tenant.Teams {
 			metadata, err := s.searchGroupsForAlias(tenant.ID, team.ID, team.Groups, alias, team, tenant)

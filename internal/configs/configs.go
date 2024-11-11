@@ -7,31 +7,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
-	meta.Meta `json:"-" yaml:"-"`
-
-	Env string `json:"env" yaml:"env"`
-
-	Http    HttpServer    `json:"http" yaml:"http"`
-	Grpc    GrpcServer    `json:"grpc" yaml:"grpc"`
-	GraphQL GraphQLServer `json:"graphql" yaml:"graphql"`
-	Routes  Routes        `json:"configs" yaml:"configs"`
-}
-
-func defaultConfig() Config {
-	return Config{
-		Http: HttpServer{
-			Addr: ":8080",
-		},
-		Grpc: GrpcServer{
-			Addr: ":8081",
-		},
-		GraphQL: GraphQLServer{
-			Addr: ":8082",
-		},
-	}
-}
-
 func NewConfig(namespace string, app string, configFilePath string, envFilePath string) func() (*Config, error) {
 	return func() (*Config, error) {
 		var configPath string

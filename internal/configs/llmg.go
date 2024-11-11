@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"github.com/lingticio/llmg/internal/meta"
 	"github.com/lingticio/llmg/pkg/types/metadata"
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
@@ -50,6 +51,31 @@ type Tenant struct {
 type Routes struct {
 	Tenants  []Tenant                           `json:"tenants" yaml:"tenants"`
 	Upstream *metadata.UpstreamSingleOrMultiple `json:"upstream,omitempty" yaml:"upstream,omitempty"`
+}
+
+type Config struct {
+	meta.Meta `json:"-" yaml:"-"`
+
+	Env string `json:"env" yaml:"env"`
+
+	Http    HttpServer    `json:"http" yaml:"http"`
+	Grpc    GrpcServer    `json:"grpc" yaml:"grpc"`
+	GraphQL GraphQLServer `json:"graphql" yaml:"graphql"`
+	Routes  Routes        `json:"configs" yaml:"configs"`
+}
+
+func defaultConfig() Config {
+	return Config{
+		Http: HttpServer{
+			Addr: ":8080",
+		},
+		Grpc: GrpcServer{
+			Addr: ":8081",
+		},
+		GraphQL: GraphQLServer{
+			Addr: ":8082",
+		},
+	}
 }
 
 func registerLingticIoCoreConfig() {

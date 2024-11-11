@@ -2,15 +2,15 @@ package authstorage
 
 import "context"
 
-var _ EndpointAuthProvider = (*RDSEndpointAuthProvider)(nil)
+var _ EndpointProvider = (*RDSEndpointAuthProvider)(nil)
 
 type RDSEndpointAuthProvider struct {
 }
 
-func (s *RDSEndpointAuthProvider) FindMetadataByAPIKey(ctx context.Context, apiKey string) (*EndpointAuth, error) {
-	return &EndpointAuth{}, nil
+func (s *RDSEndpointAuthProvider) FindOneByAPIKey(ctx context.Context, apiKey string) (*Endpoint, error) {
+	return &Endpoint{}, nil
 }
 
-func (s *RDSEndpointAuthProvider) FindMetadataByAlias(ctx context.Context, alias string) (*EndpointAuth, error) {
-	return &EndpointAuth{}, nil
+func (s *RDSEndpointAuthProvider) FindOneByAlias(ctx context.Context, alias string) (*Endpoint, error) {
+	return &Endpoint{}, nil
 }

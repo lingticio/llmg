@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestConfigEndpointAuthStorage_FindMetadataByAPIKey(t *testing.T) {
+func TestConfigEndpointProvider_FindOneByAPIKey(t *testing.T) {
 	tenantID := xo.RandomHashString(8)
 	teamID := xo.RandomHashString(8)
 	groupID1 := xo.RandomHashString(8)
@@ -20,7 +20,7 @@ func TestConfigEndpointAuthStorage_FindMetadataByAPIKey(t *testing.T) {
 	apiKey1 := xo.RandomHashString(16)
 	apiKey2 := xo.RandomHashString(16)
 
-	s := &ConfigEndpointAuthProvider{
+	s := &ConfigEndpointProvider{
 		Config: &configs.Routes{
 			Tenants: []configs.Tenant{
 				{
@@ -59,7 +59,7 @@ func TestConfigEndpointAuthStorage_FindMetadataByAPIKey(t *testing.T) {
 		},
 	}
 
-	md, err := s.FindMetadataByAPIKey(context.TODO(), apiKey1)
+	md, err := s.FindOneByAPIKey(context.TODO(), apiKey1)
 	require.NoError(t, err)
 	require.NotNil(t, md)
 
@@ -68,7 +68,7 @@ func TestConfigEndpointAuthStorage_FindMetadataByAPIKey(t *testing.T) {
 	assert.Equal(t, groupID2, md.Group.ID())
 	assert.Equal(t, apiKey1, md.APIKey)
 
-	md, err = s.FindMetadataByAPIKey(context.TODO(), apiKey2)
+	md, err = s.FindOneByAPIKey(context.TODO(), apiKey2)
 	require.NoError(t, err)
 	require.NotNil(t, md)
 
@@ -77,12 +77,12 @@ func TestConfigEndpointAuthStorage_FindMetadataByAPIKey(t *testing.T) {
 	assert.Equal(t, groupID1, md.Group.ID())
 	assert.Equal(t, apiKey2, md.APIKey)
 
-	md, err = s.FindMetadataByAPIKey(context.TODO(), "invalid")
+	md, err = s.FindOneByAPIKey(context.TODO(), "invalid")
 	require.Error(t, err)
 	require.Nil(t, md)
 }
 
-func TestConfigEndpointAuthStorage_FindMetadataByAlias(t *testing.T) {
+func TestConfigEndpointProvider_FindOneByAlias(t *testing.T) {
 	tenantID := xo.RandomHashString(8)
 	teamID := xo.RandomHashString(8)
 	groupID1 := xo.RandomHashString(8)
@@ -91,7 +91,7 @@ func TestConfigEndpointAuthStorage_FindMetadataByAlias(t *testing.T) {
 	alias1 := "test"
 	alias2 := "test-2"
 
-	s := &ConfigEndpointAuthProvider{
+	s := &ConfigEndpointProvider{
 		Config: &configs.Routes{
 			Tenants: []configs.Tenant{
 				{
@@ -130,7 +130,7 @@ func TestConfigEndpointAuthStorage_FindMetadataByAlias(t *testing.T) {
 		},
 	}
 
-	md, err := s.FindMetadataByAlias(context.TODO(), alias1)
+	md, err := s.FindOneByAlias(context.TODO(), alias1)
 	require.NoError(t, err)
 	require.NotNil(t, md)
 
@@ -139,7 +139,7 @@ func TestConfigEndpointAuthStorage_FindMetadataByAlias(t *testing.T) {
 	assert.Equal(t, groupID2, md.Group.ID())
 	assert.Equal(t, alias1, md.Alias)
 
-	md, err = s.FindMetadataByAlias(context.TODO(), alias2)
+	md, err = s.FindOneByAlias(context.TODO(), alias2)
 	require.NoError(t, err)
 	require.NotNil(t, md)
 
@@ -148,7 +148,7 @@ func TestConfigEndpointAuthStorage_FindMetadataByAlias(t *testing.T) {
 	assert.Equal(t, groupID1, md.Group.ID())
 	assert.Equal(t, alias2, md.Alias)
 
-	md, err = s.FindMetadataByAlias(context.TODO(), "invalid")
+	md, err = s.FindOneByAlias(context.TODO(), "invalid")
 	require.Error(t, err)
 	require.Nil(t, md)
 }
@@ -194,7 +194,7 @@ func TestConfigAuthStorage_findUpstream(t *testing.T) {
 		},
 	}
 
-	s := &ConfigEndpointAuthProvider{
+	s := &ConfigEndpointProvider{
 		Config: &configs.Routes{
 			Tenants: []configs.Tenant{
 				{
@@ -240,17 +240,17 @@ func TestConfigAuthStorage_findUpstream(t *testing.T) {
 	}
 
 	// Test endpoint with its own upstream
-	md1, err := s.FindMetadataByAPIKey(context.TODO(), "key1")
+	md1, err := s.FindOneByAPIKey(context.TODO(), "key1")
 	require.NoError(t, err)
 	assert.Equal(t, endpointUpstream, md1.Upstream)
 
 	// Test endpoint inheriting from group
-	md2, err := s.FindMetadataByAPIKey(context.TODO(), "key2")
+	md2, err := s.FindOneByAPIKey(context.TODO(), "key2")
 	require.NoError(t, err)
 	assert.Equal(t, groupUpstream, md2.Upstream)
 
 	// Test endpoint inheriting from team
-	md3, err := s.FindMetadataByAPIKey(context.TODO(), "key3")
+	md3, err := s.FindOneByAPIKey(context.TODO(), "key3")
 	require.NoError(t, err)
 	assert.Equal(t, teamUpstream, md3.Upstream)
 }

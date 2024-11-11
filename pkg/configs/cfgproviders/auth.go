@@ -6,20 +6,32 @@ import (
 	"github.com/lingticio/llmg/pkg/types/metadata"
 )
 
-type EndpointAuth struct {
+type Endpoint struct {
 	metadata.UnimplementedMetadata
 
-	Tenant   metadata.Tenant
-	Team     metadata.Team
-	Group    metadata.Group
-	Upstream metadata.Upstreamable
+	Tenant   metadata.Tenant                    `json:"tenant" yaml:"tenant"`
+	Team     metadata.Team                      `json:"team" yaml:"team"`
+	Group    metadata.Group                     `json:"group" yaml:"group"`
+	Upstream *metadata.UpstreamSingleOrMultiple `json:"upstream,omitempty" yaml:"upstream,omitempty"`
 
-	ID     string
-	Alias  string
-	APIKey string
+	ID     string `json:"id" yaml:"id"`
+	Alias  string `json:"alias" yaml:"alias"`
+	APIKey string `json:"apiKey"`
 }
 
-type EndpointAuthProvider interface {
-	FindMetadataByAPIKey(ctx context.Context, apiKey string) (*EndpointAuth, error)
-	FindMetadataByAlias(ctx context.Context, alias string) (*EndpointAuth, error)
+type EndpointProviderQueryable interface {
+	FindOneByAPIKey(ctx context.Context, apiKey string) (*Endpoint, error)
+	FindOneByAlias(ctx context.Context, alias string) (*Endpoint, error)
+}
+
+type EndpointProviderMutable interface {
+	ConfigureOneUpstreamForTenant(ctx context.Context, tenantID string, upstream *metadata.UpstreamSingleOrMultiple) error
+	ConfigureOneUpstreamForTeam(ctx context.Context, teamID string, upstream *metadata.UpstreamSingleOrMultiple) error
+	ConfigureOneUpstreamForGroup(ctx context.Context, groupID string, upstream *metadata.UpstreamSingleOrMultiple) error
+	ConfigureOneUpstreamForEndpoint(ctx context.Context, endpointID string, upstream *metadata.UpstreamSingleOrMultiple) error
+	ConfigureOne(ctx context.Context, apiKey string, alias string, endpoint *Endpoint) error
+}
+
+type EndpointProvider interface {
+	EndpointProviderQueryable
 }
