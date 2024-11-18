@@ -96,7 +96,7 @@ func (e *Error) WithCaller() *Error {
 	e.caller = &jsonapi.ErrorCaller{
 		Function: runtime.FuncForPC(pc).Name(),
 		File:     file,
-		Line:     int32(line),
+		Line:     int64(line),
 	}
 
 	return e
