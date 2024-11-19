@@ -65,7 +65,7 @@ message ErrorObject {
 
 message ErrorCaller {
   string file = 1;
-  int32 line = 2;
+  int64 line = 2;
   string function = 3;
 }
 
