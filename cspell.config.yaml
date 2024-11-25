@@ -46,6 +46,7 @@ words:
   - Probs
   - Protobuf
   - protocolbuffers
+  - protoiface
   - protovalidate
   - rediskeys
   - Rueidis
