@@ -93,7 +93,7 @@ func (s *OpenAIService) CreateChatCompletion(ctx context.Context, req *openaiapi
 
 			return choice
 		}),
-		ServiceTier:       req.ServiceTier,
+		ServiceTier:       lo.ToPtr(req.GetServiceTier()),
 		SystemFingerprint: lo.ToPtr(openaiResponse.SystemFingerprint),
 		Usage: &openaiapiv1.ChatCompletionUsage{
 			PromptTokens:     int64(openaiResponse.Usage.PromptTokens),
@@ -104,6 +104,7 @@ func (s *OpenAIService) CreateChatCompletion(ctx context.Context, req *openaiapi
 
 	return response, nil
 }
+
 func (s *OpenAIService) CreateChatCompletionStream(req *openaiapiv1.CreateChatCompletionStreamRequest, server openaiapiv1.OpenAIService_CreateChatCompletionStreamServer) error {
 	config, err := clientConfigFromContext(server.Context())
 	if err != nil {

@@ -131,7 +131,7 @@ func TestNewJSONParserAgainstJSONBodyArrayMissingClose(t *testing.T) {
 func printTokenTree(tokens []*Token, indent int) {
 	for _, token := range tokens {
 		indentStr := strings.Repeat("  ", indent)
-		fmt.Printf("%s%s: %s\n", indentStr, tokenTypeToString(token.Type), token.Content)
+		fmt.Printf("%s%s: %s\n", indentStr, tokenTypeToString(token.Type), token.Content) //nolint:forbidigo
 		if len(token.Children) > 0 {
 			printTokenTree(token.Children, indent+1)
 		}

@@ -50,7 +50,7 @@ message ErrorObject {
   // a links object containing references to the source of the error.
   optional Links links = 2;
   // the HTTP status code applicable to this problem, expressed as a string value.
-  uint32 status = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"400\""}];
+  uint64 status = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"400\""}];
   // an application-specific error code, expressed as a string value.
   string code = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"USER_UPDATE_FAILED\""}];
   // a short, human-readable summary of the problem

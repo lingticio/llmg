@@ -16,7 +16,7 @@ import (
 	"github.com/lingticio/llmg/pkg/apierrors"
 )
 
-func handleStatusError(logger *logger.Logger, request *http.Request, s *status.Status, err error) *apierrors.ErrResponse {
+func handleStatusError(logger *logger.Logger, request *http.Request, s *status.Status, err error) *apierrors.ErrResponse { //nolint:cyclop
 	switch s.Code() { //nolint
 	case codes.InvalidArgument:
 		if len(s.Details()) > 0 {
@@ -41,8 +41,8 @@ func handleStatusError(logger *logger.Logger, request *http.Request, s *status.S
 			zap.String("path", request.URL.Path),
 		}
 		if errorCaller != nil {
-			fields = append(fields, zap.String("file", fmt.Sprintf("%s:%d", errorCaller.File, errorCaller.Line)))
-			fields = append(fields, zap.String("function", errorCaller.Function))
+			fields = append(fields, zap.String("file", fmt.Sprintf("%s:%d", errorCaller.GetFile(), errorCaller.GetLine())))
+			fields = append(fields, zap.String("function", errorCaller.GetFunction()))
 		}
 
 		logger.Error("internal error", fields...)
@@ -87,7 +87,7 @@ func handleError(logger *logger.Logger, request *http.Request, err error) *apier
 	return apierrors.NewErrInternal().AsResponse()
 }
 
-func HttpErrorHandler(logger *logger.Logger) func(ctx context.Context, _ *runtime.ServeMux, _ runtime.Marshaler, writer http.ResponseWriter, _ *http.Request, err error) {
+func HTTPErrorHandler(logger *logger.Logger) func(ctx context.Context, _ *runtime.ServeMux, _ runtime.Marshaler, writer http.ResponseWriter, _ *http.Request, err error) {
 	return func(ctx context.Context, _ *runtime.ServeMux, _ runtime.Marshaler, writer http.ResponseWriter, request *http.Request, err error) {
 		if err != nil {
 			errResp := handleError(logger, request, err)
@@ -95,7 +95,7 @@ func HttpErrorHandler(logger *logger.Logger) func(ctx context.Context, _ *runtim
 			b, _ := json.Marshal(errResp)
 
 			writer.Header().Set("Content-Type", "application/json")
-			writer.WriteHeader(errResp.HttpStatus())
+			writer.WriteHeader(errResp.HTTPStatus())
 
 			_, _ = writer.Write(b)
 		}

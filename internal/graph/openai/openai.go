@@ -46,8 +46,8 @@ func (h *GraphQLHandler) InstallForEcho(endpoint string, e *echo.Echo) {
 			CheckOrigin: func(r *http.Request) bool {
 				return true
 			},
-			ReadBufferSize:  1024,
-			WriteBufferSize: 1024,
+			ReadBufferSize:  1024, //nolint:mnd
+			WriteBufferSize: 1024, //nolint:mnd
 		},
 	})
 

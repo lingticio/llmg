@@ -12,6 +12,11 @@ import (
 	"github.com/samber/lo"
 )
 
+const (
+	retrieveTop3  int = 3
+	retrieveTop10 int = 10
+)
+
 type rueidisJSONOptions struct {
 	dimension int
 }
@@ -105,7 +110,7 @@ func (c *SemanticCacheRueidisJSON[T]) createIndex(ctx context.Context, dimension
 
 	err := c.repo.CreateIndex(ctx, func(schema om.FtCreateSchema) rueidis.Completed {
 		return schema.
-			FieldName("$.vec").As("vec").Vector("FLAT", 6, "TYPE", "FLOAT64", "DIM", strconv.FormatInt(int64(dim), 10), "DISTANCE_METRIC", "COSINE").
+			FieldName("$.vec").As("vec").Vector("FLAT", 6, "TYPE", "FLOAT64", "DIM", strconv.FormatInt(int64(dim), 10), "DISTANCE_METRIC", "COSINE"). //nolint:mnd
 			Build()
 	})
 	if err != nil {
@@ -134,11 +139,11 @@ func (c *SemanticCacheRueidisJSON[T]) ensureIndex(ctx context.Context, dimension
 }
 
 func (c *SemanticCacheRueidisJSON[T]) RetrieveTop3ByVectors(ctx context.Context, vectors []float64) ([]*Retrieved[*T], error) {
-	return c.RetrieveByVectors(ctx, vectors, 3)
+	return c.RetrieveByVectors(ctx, vectors, retrieveTop3)
 }
 
 func (c *SemanticCacheRueidisJSON[T]) RetrieveTop10ByVectors(ctx context.Context, vectors []float64) ([]*Retrieved[*T], error) {
-	return c.RetrieveByVectors(ctx, vectors, 10)
+	return c.RetrieveByVectors(ctx, vectors, retrieveTop10)
 }
 
 func (c *SemanticCacheRueidisJSON[T]) RetrieveFirstByVectors(ctx context.Context, vectors []float64) (*Retrieved[*T], error) {
@@ -163,8 +168,8 @@ func (c *SemanticCacheRueidisJSON[T]) RetrieveByVectors(ctx context.Context, vec
 		FtSearch().Index(c.repo.IndexName()).Query("(*)=>[KNN "+strconv.FormatInt(int64(first), 10)+" @vec $V AS cache_score]").
 		Return("3").Identifier("$.object").Identifier("__vec_score").Identifier("cache_score").
 		Sortby("cache_score").
-		Params().Nargs(2).NameValue().NameValue("V", rueidis.VectorString64(vectors)).
-		Dialect(2).
+		Params().Nargs(2).NameValue().NameValue("V", rueidis.VectorString64(vectors)). //nolint:mnd
+		Dialect(2).                                                                    //nolint:mnd
 		Build()
 
 	resp := c.rueidis.Do(ctx, cmd)

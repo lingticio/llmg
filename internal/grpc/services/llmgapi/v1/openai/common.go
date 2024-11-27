@@ -8,10 +8,11 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
+// TODO: split into small functions
 func gRPCRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionRequest) openai.ChatCompletionRequest {
 	request := openai.ChatCompletionRequest{
-		Model: req.Model,
-		Messages: lo.Map(req.Messages, func(item *openaiapiv1.ChatCompletionMessage, index int) openai.ChatCompletionMessage {
+		Model: req.GetModel(),
+		Messages: lo.Map(req.GetMessages(), func(item *openaiapiv1.ChatCompletionMessage, index int) openai.ChatCompletionMessage {
 			message := openai.ChatCompletionMessage{}
 
 			switch {
@@ -22,7 +23,7 @@ func gRPCRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionRequest) op
 					message.Name = systemMessage.GetName()
 				}
 
-				message.Content = systemMessage.Content
+				message.Content = systemMessage.GetContent()
 				message.Role = openai.ChatMessageRoleSystem
 			case item.GetUserMessage() != nil:
 				userMessage := item.GetUserMessage()
@@ -32,23 +33,23 @@ func gRPCRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionRequest) op
 				}
 
 				if userMessage.GetContent() != nil && userMessage.GetContent().GetText() != nil {
-					message.Content = userMessage.GetContent().GetText().Content
+					message.Content = userMessage.GetContent().GetText().GetContent()
 				} else if userMessage.GetContent() != nil && userMessage.GetContent().GetMulti() != nil {
 					message.MultiContent = make([]openai.ChatMessagePart, 0)
-					for _, part := range userMessage.GetContent().GetMulti().Parts {
+					for _, part := range userMessage.GetContent().GetMulti().GetParts() {
 						openaiPart := openai.ChatMessagePart{}
 
 						switch {
 						case part.GetText() != nil:
 							openaiPart.Type = openai.ChatMessagePartTypeText
 
-							openaiPart.Text = part.GetText().Text
+							openaiPart.Text = part.GetText().GetText()
 						case part.GetImage() != nil:
 							openaiPart.ImageURL = &openai.ChatMessageImageURL{
-								URL: part.GetImage().ImageUrl.Url,
+								URL: part.GetImage().GetImageUrl().GetUrl(),
 							}
 							if part.GetImage().ImageUrl.Detail != nil {
-								openaiPart.ImageURL.Detail = openai.ImageURLDetail(*part.GetImage().ImageUrl.Detail)
+								openaiPart.ImageURL.Detail = openai.ImageURLDetail(part.GetImage().GetImageUrl().GetDetail())
 							} else {
 								openaiPart.ImageURL.Detail = openai.ImageURLDetailAuto
 							}
@@ -73,11 +74,11 @@ func gRPCRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionRequest) op
 
 					for _, toolCall := range assistantMessage.GetToolCalls() {
 						openaiToolCall := openai.ToolCall{
-							ID:   toolCall.Id,
-							Type: openai.ToolType(toolCall.Type),
+							ID:   toolCall.GetId(),
+							Type: openai.ToolType(toolCall.GetType()),
 							Function: openai.FunctionCall{
-								Name:      toolCall.Function.Name,
-								Arguments: toolCall.Function.Arguments,
+								Name:      toolCall.GetFunction().GetName(),
+								Arguments: toolCall.GetFunction().GetArguments(),
 							},
 						}
 
@@ -90,8 +91,8 @@ func gRPCRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionRequest) op
 				toolMessage := item.GetToolMessage()
 
 				message.Role = openai.ChatMessageRoleTool
-				message.Content = toolMessage.Content
-				message.ToolCallID = toolMessage.ToolCallId
+				message.Content = toolMessage.GetContent()
+				message.ToolCallID = toolMessage.GetToolCallId()
 			}
 
 			return message
@@ -101,35 +102,35 @@ func gRPCRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionRequest) op
 		request.MaxTokens = int(req.GetMaxTokens())
 	}
 	if req.Temperature != nil {
-		request.Temperature = *req.Temperature
+		request.Temperature = req.GetTemperature()
 	}
 	if req.TopP != nil {
-		request.TopP = *req.TopP
+		request.TopP = req.GetTopP()
 	}
 	if req.N != nil {
 		request.N = int(req.GetN())
 	}
 	if req.Stop != nil {
-		request.Stop = req.StopArray
+		request.Stop = req.GetStopArray()
 	}
 	if req.PresencePenalty != nil {
-		request.PresencePenalty = *req.PresencePenalty
+		request.PresencePenalty = req.GetPresencePenalty()
 	}
-	if req.ResponseFormat != nil {
+	if req.GetResponseFormat() != nil {
 		request.ResponseFormat = &openai.ChatCompletionResponseFormat{}
 
 		switch {
-		case req.ResponseFormat.GetText() != nil:
+		case req.GetResponseFormat().GetText() != nil:
 			request.ResponseFormat.Type = openai.ChatCompletionResponseFormatTypeText
-		case req.ResponseFormat.GetJsonObject() != nil:
+		case req.GetResponseFormat().GetJsonObject() != nil:
 			request.ResponseFormat.Type = openai.ChatCompletionResponseFormatTypeJSONObject
-		case req.ResponseFormat.GetJsonSchema() != nil:
+		case req.GetResponseFormat().GetJsonSchema() != nil:
 			request.ResponseFormat.Type = openai.ChatCompletionResponseFormatTypeJSONSchema
 			request.ResponseFormat.JSONSchema = &openai.ChatCompletionResponseFormatJSONSchema{
-				Name:        req.ResponseFormat.GetJsonSchema().GetJsonSchema().GetName(),
-				Description: req.ResponseFormat.GetJsonSchema().GetJsonSchema().GetDescription(),
-				Schema:      json.RawMessage([]byte(req.ResponseFormat.GetJsonSchema().GetJsonSchema().Schema)),
-				Strict:      req.ResponseFormat.GetJsonSchema().GetJsonSchema().GetStrict(),
+				Name:        req.GetResponseFormat().GetJsonSchema().GetJsonSchema().GetName(),
+				Description: req.GetResponseFormat().GetJsonSchema().GetJsonSchema().GetDescription(),
+				Schema:      json.RawMessage([]byte(req.GetResponseFormat().GetJsonSchema().GetJsonSchema().GetSchema())),
+				Strict:      req.GetResponseFormat().GetJsonSchema().GetJsonSchema().GetStrict(),
 			}
 		}
 	}
@@ -137,12 +138,12 @@ func gRPCRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionRequest) op
 		request.Seed = lo.ToPtr(int(req.GetSeed()))
 	}
 	if req.FrequencyPenalty != nil {
-		request.FrequencyPenalty = *req.FrequencyPenalty
+		request.FrequencyPenalty = req.GetFrequencyPenalty()
 	}
 	if req.LogitBias != nil {
 		request.LogitBias = lo.FromEntries(
 			lo.Map(
-				lo.Entries(req.LogitBias),
+				lo.Entries(req.GetLogitBias()),
 				func(item lo.Entry[string, int64], index int) lo.Entry[string, int] {
 					return lo.Entry[string, int]{
 						Key:   item.Key,
@@ -153,44 +154,45 @@ func gRPCRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionRequest) op
 		)
 	}
 	if req.LogProbs != nil {
-		request.LogProbs = *req.LogProbs
+		request.LogProbs = req.GetLogProbs()
 	}
 	if req.TopLogProbs != nil {
 		request.TopLogProbs = int(req.GetTopLogProbs())
 	}
 	if req.User != nil {
-		request.User = *req.User
+		request.User = req.GetUser()
 	}
 	if req.Tools != nil {
 		request.Tools = make([]openai.Tool, 0)
 
-		for _, tool := range req.Tools {
+		for _, tool := range req.GetTools() {
 			openaiTool := openai.Tool{
-				Type: openai.ToolType(tool.Type),
+				Type: openai.ToolType(tool.GetType()),
 				Function: &openai.FunctionDefinition{
-					Name:        tool.Function.Name,
-					Description: tool.Function.Description,
-					Parameters:  tool.Function.Parameters,
+					Name:        tool.GetFunction().GetName(),
+					Description: tool.GetFunction().GetDescription(),
+					Parameters:  tool.GetFunction().GetParameters(),
 				},
 			}
 
 			request.Tools = append(request.Tools, openaiTool)
 		}
 	}
-	if req.ToolChoice != nil {
+	if req.GetToolChoice() != nil {
 		request.ToolChoice = req.GetToolChoice()
 	}
 	if req.ParallelToolCalls != nil {
-		request.ParallelToolCalls = *req.ParallelToolCalls
+		request.ParallelToolCalls = req.GetParallelToolCalls()
 	}
 
 	return request
 }
 
+// TODO: split into small functions
 func gRPCStreamRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionStreamRequest) openai.ChatCompletionRequest {
 	request := openai.ChatCompletionRequest{
-		Model: req.Model,
-		Messages: lo.Map(req.Messages, func(item *openaiapiv1.ChatCompletionMessage, index int) openai.ChatCompletionMessage {
+		Model: req.GetModel(),
+		Messages: lo.Map(req.GetMessages(), func(item *openaiapiv1.ChatCompletionMessage, index int) openai.ChatCompletionMessage {
 			message := openai.ChatCompletionMessage{}
 
 			switch {
@@ -201,7 +203,7 @@ func gRPCStreamRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionStrea
 					message.Name = systemMessage.GetName()
 				}
 
-				message.Content = systemMessage.Content
+				message.Content = systemMessage.GetContent()
 				message.Role = openai.ChatMessageRoleSystem
 			case item.GetUserMessage() != nil:
 				userMessage := item.GetUserMessage()
@@ -211,23 +213,23 @@ func gRPCStreamRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionStrea
 				}
 
 				if userMessage.GetContent() != nil && userMessage.GetContent().GetText() != nil {
-					message.Content = userMessage.GetContent().GetText().Content
+					message.Content = userMessage.GetContent().GetText().GetContent()
 				} else if userMessage.GetContent() != nil && userMessage.GetContent().GetMulti() != nil {
 					message.MultiContent = make([]openai.ChatMessagePart, 0)
-					for _, part := range userMessage.GetContent().GetMulti().Parts {
+					for _, part := range userMessage.GetContent().GetMulti().GetParts() {
 						openaiPart := openai.ChatMessagePart{}
 
 						switch {
 						case part.GetText() != nil:
 							openaiPart.Type = openai.ChatMessagePartTypeText
 
-							openaiPart.Text = part.GetText().Text
+							openaiPart.Text = part.GetText().GetText()
 						case part.GetImage() != nil:
 							openaiPart.ImageURL = &openai.ChatMessageImageURL{
-								URL: part.GetImage().ImageUrl.Url,
+								URL: part.GetImage().GetImageUrl().GetUrl(),
 							}
 							if part.GetImage().ImageUrl.Detail != nil {
-								openaiPart.ImageURL.Detail = openai.ImageURLDetail(*part.GetImage().ImageUrl.Detail)
+								openaiPart.ImageURL.Detail = openai.ImageURLDetail(part.GetImage().GetImageUrl().GetDetail())
 							} else {
 								openaiPart.ImageURL.Detail = openai.ImageURLDetailAuto
 							}
@@ -252,11 +254,11 @@ func gRPCStreamRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionStrea
 
 					for _, toolCall := range assistantMessage.GetToolCalls() {
 						openaiToolCall := openai.ToolCall{
-							ID:   toolCall.Id,
-							Type: openai.ToolType(toolCall.Type),
+							ID:   toolCall.GetId(),
+							Type: openai.ToolType(toolCall.GetType()),
 							Function: openai.FunctionCall{
-								Name:      toolCall.Function.Name,
-								Arguments: toolCall.Function.Arguments,
+								Name:      toolCall.GetFunction().GetName(),
+								Arguments: toolCall.GetFunction().GetArguments(),
 							},
 						}
 
@@ -269,8 +271,8 @@ func gRPCStreamRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionStrea
 				toolMessage := item.GetToolMessage()
 
 				message.Role = openai.ChatMessageRoleTool
-				message.Content = toolMessage.Content
-				message.ToolCallID = toolMessage.ToolCallId
+				message.Content = toolMessage.GetContent()
+				message.ToolCallID = toolMessage.GetToolCallId()
 			}
 
 			return message
@@ -281,35 +283,35 @@ func gRPCStreamRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionStrea
 		request.MaxTokens = int(req.GetMaxTokens())
 	}
 	if req.Temperature != nil {
-		request.Temperature = *req.Temperature
+		request.Temperature = req.GetTemperature()
 	}
 	if req.TopP != nil {
-		request.TopP = *req.TopP
+		request.TopP = req.GetTopP()
 	}
 	if req.N != nil {
 		request.N = int(req.GetN())
 	}
 	if req.Stop != nil {
-		request.Stop = req.StopArray
+		request.Stop = req.GetStopArray()
 	}
 	if req.PresencePenalty != nil {
-		request.PresencePenalty = *req.PresencePenalty
+		request.PresencePenalty = req.GetPresencePenalty()
 	}
-	if req.ResponseFormat != nil {
+	if req.GetResponseFormat() != nil {
 		request.ResponseFormat = &openai.ChatCompletionResponseFormat{}
 
 		switch {
-		case req.ResponseFormat.GetText() != nil:
+		case req.GetResponseFormat().GetText() != nil:
 			request.ResponseFormat.Type = openai.ChatCompletionResponseFormatTypeText
-		case req.ResponseFormat.GetJsonObject() != nil:
+		case req.GetResponseFormat().GetJsonObject() != nil:
 			request.ResponseFormat.Type = openai.ChatCompletionResponseFormatTypeJSONObject
-		case req.ResponseFormat.GetJsonSchema() != nil:
+		case req.GetResponseFormat().GetJsonSchema() != nil:
 			request.ResponseFormat.Type = openai.ChatCompletionResponseFormatTypeJSONSchema
 			request.ResponseFormat.JSONSchema = &openai.ChatCompletionResponseFormatJSONSchema{
-				Name:        req.ResponseFormat.GetJsonSchema().GetJsonSchema().GetName(),
-				Description: req.ResponseFormat.GetJsonSchema().GetJsonSchema().GetDescription(),
-				Schema:      json.RawMessage([]byte(req.ResponseFormat.GetJsonSchema().GetJsonSchema().Schema)),
-				Strict:      req.ResponseFormat.GetJsonSchema().GetJsonSchema().GetStrict(),
+				Name:        req.GetResponseFormat().GetJsonSchema().GetJsonSchema().GetName(),
+				Description: req.GetResponseFormat().GetJsonSchema().GetJsonSchema().GetDescription(),
+				Schema:      json.RawMessage([]byte(req.GetResponseFormat().GetJsonSchema().GetJsonSchema().GetSchema())),
+				Strict:      req.GetResponseFormat().GetJsonSchema().GetJsonSchema().GetStrict(),
 			}
 		}
 	}
@@ -317,12 +319,12 @@ func gRPCStreamRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionStrea
 		request.Seed = lo.ToPtr(int(req.GetSeed()))
 	}
 	if req.FrequencyPenalty != nil {
-		request.FrequencyPenalty = *req.FrequencyPenalty
+		request.FrequencyPenalty = req.GetFrequencyPenalty()
 	}
 	if req.LogitBias != nil {
 		request.LogitBias = lo.FromEntries(
 			lo.Map(
-				lo.Entries(req.LogitBias),
+				lo.Entries(req.GetLogitBias()),
 				func(item lo.Entry[string, int64], index int) lo.Entry[string, int] {
 					return lo.Entry[string, int]{
 						Key:   item.Key,
@@ -333,39 +335,39 @@ func gRPCStreamRequestToOpenAIRequest(req *openaiapiv1.CreateChatCompletionStrea
 		)
 	}
 	if req.LogProbs != nil {
-		request.LogProbs = *req.LogProbs
+		request.LogProbs = req.GetLogProbs()
 	}
 	if req.TopLogProbs != nil {
 		request.TopLogProbs = int(req.GetTopLogProbs())
 	}
 	if req.User != nil {
-		request.User = *req.User
+		request.User = req.GetUser()
 	}
 	if req.Tools != nil {
 		request.Tools = make([]openai.Tool, 0)
 
-		for _, tool := range req.Tools {
+		for _, tool := range req.GetTools() {
 			openaiTool := openai.Tool{
-				Type: openai.ToolType(tool.Type),
+				Type: openai.ToolType(tool.GetType()),
 				Function: &openai.FunctionDefinition{
-					Name:        tool.Function.Name,
-					Description: tool.Function.Description,
-					Parameters:  tool.Function.Parameters,
+					Name:        tool.GetFunction().GetName(),
+					Description: tool.GetFunction().GetDescription(),
+					Parameters:  tool.GetFunction().GetParameters(),
 				},
 			}
 
 			request.Tools = append(request.Tools, openaiTool)
 		}
 	}
-	if req.ToolChoice != nil {
+	if req.GetToolChoice() != nil {
 		request.ToolChoice = req.GetToolChoice()
 	}
 	if req.ParallelToolCalls != nil {
-		request.ParallelToolCalls = *req.ParallelToolCalls
+		request.ParallelToolCalls = req.GetParallelToolCalls()
 	}
-	if req.StreamOptions != nil {
+	if req.GetStreamOptions() != nil {
 		request.StreamOptions = &openai.StreamOptions{
-			IncludeUsage: lo.FromPtr(req.StreamOptions.IncludeUsage),
+			IncludeUsage: req.GetStreamOptions().GetIncludeUsage(),
 		}
 	}
 

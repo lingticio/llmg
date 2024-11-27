@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -50,7 +51,7 @@ func NewServer() func(params NewServerParams) *Server {
 			},
 			AllowHeaders: []string{"Origin", "Content-Length", "Content-Type"},
 			AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"},
-			MaxAge:       60 * 60 * 24 * 7,
+			MaxAge:       60 * 60 * 24 * 7, //nolint:mnd
 		}))
 
 		params.OpenAIHandler.InstallForEcho("/v1/openai/query", e)
@@ -70,7 +71,8 @@ func NewServer() func(params NewServerParams) *Server {
 			OnStop: func(ctx context.Context) error {
 				closeCtx, cancel := context.WithTimeout(context.Background(), time.Minute)
 				defer cancel()
-				if err := server.Shutdown(closeCtx); err != nil && err != http.ErrServerClosed {
+
+				if err := server.Shutdown(closeCtx); err != nil && !errors.Is(err, http.ErrServerClosed) {
 					params.Logger.Error("shutdown graphql server failed", zap.Error(err))
 					return err
 				}
@@ -91,12 +93,12 @@ func Run() func(logger *logger.Logger, server *Server) error {
 
 		listener, err := net.Listen("tcp", server.Addr)
 		if err != nil {
-			return fmt.Errorf("failed to listen %s: %v", server.Addr, err)
+			return fmt.Errorf("failed to listen %s: %w", server.Addr, err)
 		}
 
 		go func() {
 			err = server.Serve(listener)
-			if err != nil && err != http.ErrServerClosed {
+			if err != nil && !errors.Is(err, http.ErrServerClosed) {
 				logger.Fatal(err.Error())
 			}
 		}()

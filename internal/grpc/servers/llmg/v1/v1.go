@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"errors"
 	"net"
 	"net/http"
 
@@ -61,7 +62,7 @@ func Run() func(*logger.Logger, *V1GRPCServer) error {
 
 		go func() {
 			err := server.GRPCServer.Serve(listener)
-			if err != nil && err != http.ErrServerClosed {
+			if err != nil && !errors.Is(err, http.ErrServerClosed) {
 				logger.Error("failed to serve v1 gRPC server", zap.Error(err))
 			}
 		}()

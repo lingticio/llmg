@@ -15,7 +15,7 @@ type Identifiable interface {
 }
 
 type Tenant struct {
-	Id string `json:"id" yaml:"id"`
+	Id string `json:"id" yaml:"id"` //nolint:stylecheck
 }
 
 func (t Tenant) ID() string {
@@ -23,7 +23,7 @@ func (t Tenant) ID() string {
 }
 
 type Team struct {
-	Id string `json:"id" yaml:"id"`
+	Id string `json:"id" yaml:"id"` //nolint:stylecheck
 }
 
 func (t Team) ID() string {
@@ -31,7 +31,7 @@ func (t Team) ID() string {
 }
 
 type Group struct {
-	Id string `json:"id" yaml:"id"`
+	Id string `json:"id" yaml:"id"` //nolint:stylecheck
 }
 
 func (g Group) ID() string {

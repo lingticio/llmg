@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type HttpServer struct {
+type HTTPServer struct {
 	Addr string `json:"server_addr" yaml:"server_addr"`
 }
 
@@ -58,7 +58,7 @@ type Config struct {
 
 	Env string `json:"env" yaml:"env"`
 
-	Http    HttpServer    `json:"http" yaml:"http"`
+	HTTP    HTTPServer    `json:"http" yaml:"http"`
 	Grpc    GrpcServer    `json:"grpc" yaml:"grpc"`
 	GraphQL GraphQLServer `json:"graphql" yaml:"graphql"`
 	Routes  Routes        `json:"configs" yaml:"configs"`
@@ -66,7 +66,7 @@ type Config struct {
 
 func defaultConfig() Config {
 	return Config{
-		Http: HttpServer{
+		HTTP: HTTPServer{
 			Addr: ":8080",
 		},
 		Grpc: GrpcServer{

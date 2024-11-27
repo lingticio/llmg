@@ -2,7 +2,7 @@ package authstorage
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/lingticio/llmg/internal/configs"
 	"github.com/lingticio/llmg/pkg/types/metadata"
@@ -54,7 +54,7 @@ func (s *ConfigEndpointProvider) searchGroupsForAPIKey(tenantID, teamID string, 
 		}
 	}
 
-	return nil, fmt.Errorf("api key not found")
+	return nil, errors.New("api key not found")
 }
 
 func (s *ConfigEndpointProvider) FindOneByAPIKey(ctx context.Context, apiKey string) (*Endpoint, error) {
@@ -67,7 +67,7 @@ func (s *ConfigEndpointProvider) FindOneByAPIKey(ctx context.Context, apiKey str
 		}
 	}
 
-	return nil, fmt.Errorf("api key not found")
+	return nil, errors.New("api key not found")
 }
 
 func (s *ConfigEndpointProvider) searchGroupsForAlias(tenantID, teamID string, groups []configs.Group, alias string, team configs.Team, tenant configs.Tenant) (*Endpoint, error) {
@@ -96,7 +96,7 @@ func (s *ConfigEndpointProvider) searchGroupsForAlias(tenantID, teamID string, g
 		}
 	}
 
-	return nil, fmt.Errorf("alias not found")
+	return nil, errors.New("alias not found")
 }
 
 func (s *ConfigEndpointProvider) FindOneByAlias(ctx context.Context, alias string) (*Endpoint, error) {
@@ -109,5 +109,5 @@ func (s *ConfigEndpointProvider) FindOneByAlias(ctx context.Context, alias strin
 		}
 	}
 
-	return nil, fmt.Errorf("alias not found")
+	return nil, errors.New("alias not found")
 }

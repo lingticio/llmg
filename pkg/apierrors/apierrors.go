@@ -1,7 +1,9 @@
 package apierrors
 
 import (
+	"errors"
 	"fmt"
+	"net/http"
 	"runtime"
 
 	"github.com/bufbuild/protovalidate-go"
@@ -18,12 +20,12 @@ type Error struct {
 
 	caller *jsonapi.ErrorCaller
 
-	grpcStatus uint32
+	grpcStatus uint64
 	rawError   error
 }
 
 func (e *Error) AsStatus() error {
-	newStatus := status.New(codes.Code(e.grpcStatus), lo.Ternary(e.Detail == "", e.Title, e.Detail))
+	newStatus := status.New(codes.Code(e.grpcStatus), lo.Ternary(e.Detail == "", e.Title, e.Detail)) //nolint:gosec
 
 	details := []protoiface.MessageV1{e.ErrorObject}
 	if e.Caller() != nil {
@@ -41,7 +43,7 @@ func (e *Error) AsResponse() *ErrResponse {
 
 func (e *Error) AsEchoResponse(c echo.Context) error {
 	resp := e.AsResponse()
-	return c.JSON(resp.HttpStatus(), resp)
+	return c.JSON(resp.HTTPStatus(), resp)
 }
 
 func (e *Error) Caller() *jsonapi.ErrorCaller {
@@ -52,10 +54,10 @@ func NewError[S ~int, GS ~uint32](status S, grpcStatus GS, code string) *Error {
 	return &Error{
 		ErrorObject: &jsonapi.ErrorObject{
 			Id:     code,
-			Status: uint32(status),
+			Status: uint64(status),
 			Code:   code,
 		},
-		grpcStatus: uint32(grpcStatus),
+		grpcStatus: uint64(grpcStatus),
 	}
 }
 
@@ -67,19 +69,19 @@ func (e *Error) WithError(err error) *Error {
 }
 
 func (e *Error) WithValidationError(err error) *Error {
-	validationErr, ok := err.(*protovalidate.ValidationError)
-	if !ok {
+	var validationErr *protovalidate.ValidationError
+	if !errors.As(err, &validationErr) {
 		return e.WithDetail(err.Error())
 	}
 
 	validationErrProto := validationErr.ToProto()
-	if len(validationErrProto.Violations) == 0 {
+	if len(validationErrProto.GetViolations()) == 0 {
 		return e.WithDetail(err.Error())
 	}
 
-	fieldPath := lo.FromPtrOr(validationErrProto.Violations[0].FieldPath, "")
-	forKey := lo.FromPtrOr(validationErrProto.Violations[0].ForKey, false)
-	message := lo.FromPtrOr(validationErrProto.Violations[0].Message, "")
+	fieldPath := validationErrProto.GetViolations()[0].GetFieldPath()
+	forKey := validationErrProto.GetViolations()[0].GetForKey()
+	message := validationErrProto.GetViolations()[0].GetMessage()
 
 	if forKey {
 		e.WithDetail(message).WithSourceParameter(fieldPath)
@@ -181,20 +183,20 @@ func (e *ErrResponse) WithError(err *Error) *ErrResponse {
 }
 
 func (e *ErrResponse) WithValidationError(err error) *ErrResponse {
-	validationErr, ok := err.(*protovalidate.ValidationError)
-	if !ok {
+	var validationErr *protovalidate.ValidationError
+	if !errors.As(err, &validationErr) {
 		return e.WithError(NewErrInvalidArgument().WithError(err))
 	}
 
 	validationErrProto := validationErr.ToProto()
-	if len(validationErrProto.Violations) == 0 {
+	if len(validationErrProto.GetViolations()) == 0 {
 		return e.WithError(NewErrInvalidArgument().WithError(err))
 	}
 
-	for _, violation := range validationErrProto.Violations {
-		fieldPath := lo.FromPtrOr(violation.FieldPath, "")
-		forKey := lo.FromPtrOr(violation.ForKey, false)
-		message := lo.FromPtrOr(violation.Message, "")
+	for _, violation := range validationErrProto.GetViolations() {
+		fieldPath := violation.GetFieldPath()
+		forKey := violation.GetForKey()
+		message := violation.GetMessage()
 
 		if forKey {
 			e.WithError(NewErrInvalidArgument().WithDetail(message).WithSourceParameter(fieldPath))
@@ -206,10 +208,10 @@ func (e *ErrResponse) WithValidationError(err error) *ErrResponse {
 	return e
 }
 
-func (e *ErrResponse) HttpStatus() int {
+func (e *ErrResponse) HTTPStatus() int {
 	if len(e.Errors) == 0 {
-		return 200
+		return http.StatusOK
 	}
 
-	return int(e.Errors[0].Status)
+	return int(e.Errors[0].GetStatus()) //nolint:gosec
 }

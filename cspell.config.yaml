@@ -1,5 +1,7 @@
 version: "0.2"
-ignorePaths: []
+ignorePaths:
+  - go.sum
+  - go.mod
 dictionaryDefinitions: []
 dictionaries: []
 words:
@@ -8,18 +10,40 @@ words:
   - APIURL
   - Balancable
   - bufbuild
+  - containedctx
+  - contextcheck
   - coreapi
   - coreapiv1
+  - cyclop
+  - depguard
   - Detailf
+  - dupl
   - entgo
+  - errorlint
+  - execinquery
+  - exhaustruct
+  - forbidigo
+  - funlen
   - gatewayapi
   - gatewayapiv
+  - getkin
+  - gochecknoglobals
+  - gocognit
+  - gocritic
+  - gocyclo
+  - godotenv
+  - godox
+  - gofumpt
+  - gomnd
+  - gonanoid
   - googleapis
+  - gosec
   - gqlerror
   - gqlgen
   - grpcpkg
   - grpcservers
   - grpcservices
+  - ireturn
   - jsonapi
   - jsonfmt
   - jsonschema
@@ -29,22 +53,34 @@ words:
   - lingticio
   - llmg
   - llmgapi
+  - Logit
+  - Logprob
+  - maintidx
   - managementapi
   - managementapiv1
   - mapstructure
+  - matoous
   - mitchellh
   - modelv1
   - Nargs
   - nekomeowww
+  - nestif
   - Nillable
+  - nilnil
+  - nlreturn
   - nolint
+  - nonamedreturns
   - openai
   - openaiapiv1
   - openapi
   - openapiv2
   - openapiv3
+  - paralleltest
+  - perfsprint
   - Probs
   - Protobuf
+  - protoc_gen_openapiv2
+  - protoc-gen-openapiv2
   - protocolbuffers
   - protoiface
   - protovalidate
@@ -58,13 +94,19 @@ words:
   - serverv1
   - Sortby
   - stretchr
+  - stylecheck
   - Supabase
+  - tagalign
+  - testpackage
   - thumbhash
   - timestamppb
+  - Upgrader
   - Upstreamable
   - Upstreams
+  - varnamelen
   - vektah
   - wellknowntypes
+  - wrapcheck
 ignoreWords: []
 import:
   - "@cspell/dict-golang"

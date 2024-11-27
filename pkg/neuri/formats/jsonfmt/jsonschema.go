@@ -2,9 +2,11 @@ package jsonfmt
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/samber/lo"
@@ -157,8 +159,8 @@ func handleAllOf(allOf []*jsonschema.Schema, whitespacePattern string, rootSchem
 		propertyRegExps = append(propertyRegExps, propPattern)
 	}
 
-	regex += strings.Join(propertyRegExps, fmt.Sprintf("%s,", whitespacePattern))
-	regex += fmt.Sprintf("%s\\}", whitespacePattern)
+	regex += strings.Join(propertyRegExps, whitespacePattern+",")
+	regex += whitespacePattern + "\\}"
 
 	return regex, nil
 }
@@ -235,7 +237,7 @@ func handlePrefixItems(prefixItems []*jsonschema.Schema, instance *jsonschema.Sc
 
 	commaSplitPattern := fmt.Sprintf("%s,%s", whitespacePattern, whitespacePattern)
 	tupleInner := strings.Join(elementPatterns, commaSplitPattern)
-	regex := fmt.Sprintf("\\[%s%s", whitespacePattern, tupleInner)
+	regex := "\\[" + whitespacePattern + tupleInner
 
 	if items, ok := instance.Items.(*jsonschema.Schema); ok {
 		additionalItemsRegex, err := ToRegex(items, whitespacePattern, rootSchema)
@@ -245,7 +247,7 @@ func handlePrefixItems(prefixItems []*jsonschema.Schema, instance *jsonschema.Sc
 		regex += fmt.Sprintf("(%s%s)*", commaSplitPattern, additionalItemsRegex)
 	}
 
-	regex += fmt.Sprintf("%s\\]", whitespacePattern)
+	regex += whitespacePattern + "\\]"
 
 	return regex, nil
 }
@@ -269,7 +271,7 @@ func handleEnum(enum []interface{}) (string, error) {
 			stringified = fmt.Sprintf("%v", v)
 		case bool:
 			// For booleans, use strings.ToLower to ensure "true" or "false"
-			stringified = strings.ToLower(fmt.Sprintf("%v", v))
+			stringified = strings.ToLower(strconv.FormatBool(v))
 		case nil:
 			stringified = "null"
 		case json.Number:
@@ -318,7 +320,7 @@ func handleType(instance *jsonschema.Schema, whitespacePattern string, rootSchem
 			return item
 		}), whitespacePattern, rootSchema)
 	default:
-		return "", fmt.Errorf("invalid type specification")
+		return "", errors.New("invalid type specification")
 	}
 }
 
@@ -350,6 +352,7 @@ func handleStringType(instance *jsonschema.Schema, _ string) (string, error) {
 	// Default case: any string
 	return jsonSchemaRegExpString, nil
 }
+
 func handleNumberType(instance *jsonschema.Schema) (string, error) {
 	if lo.Contains(instance.Types, "integer") {
 		return typeToRegexMap["integer"], nil
@@ -483,7 +486,7 @@ func ToRegex(instance *jsonschema.Schema, whitespacePattern string, rootSchema *
 		return handleEmptySchema(whitespacePattern, rootSchema)
 	}
 
-	return "", fmt.Errorf("unsupported schema type")
+	return "", errors.New("unsupported schema type")
 }
 
 // Turn a plain text JSON schema into a regex that matches any JSON object that follows
@@ -569,7 +572,7 @@ func ExtractBySchema(schema *jsonschema.Schema, extractFrom string) (string, err
 
 	match := re.FindString(extractFrom)
 	if match == "" {
-		return "", fmt.Errorf("no match found")
+		return "", errors.New("no match found")
 	}
 
 	return strings.TrimSpace(match), nil
@@ -635,7 +638,7 @@ func ExtractBySchemaWithParser(schema *jsonschema.Schema, extractFrom string) (s
 
 	match := re.FindString(jsonStrSorted)
 	if match == "" {
-		return "", fmt.Errorf("no match found")
+		return "", errors.New("no match found")
 	}
 
 	return strings.TrimSpace(match), nil

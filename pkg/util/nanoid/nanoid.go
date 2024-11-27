@@ -6,7 +6,7 @@ import (
 )
 
 func New() string {
-	return lo.Must(gonanoid.Generate("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 8))
+	return lo.Must(gonanoid.Generate("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 8)) //nolint:mnd
 }
 
 func NewWithLength(length int) string {

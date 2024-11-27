@@ -67,11 +67,11 @@ func NewGatewayServer() func(params NewGatewayServerParams) (*GatewayServer, err
 		}
 
 		server := &GatewayServer{
-			ListenAddr:     params.Config.Http.Addr,
+			ListenAddr:     params.Config.HTTP.Addr,
 			GRPCServerAddr: params.Config.Grpc.Addr,
 			echo:           e,
 			server: &http.Server{
-				Addr:              params.Config.Http.Addr,
+				Addr:              params.Config.HTTP.Addr,
 				Handler:           e,
 				ReadHeaderTimeout: time.Duration(30) * time.Second,
 			},
@@ -86,12 +86,12 @@ func NewGatewayServer() func(params NewGatewayServerParams) (*GatewayServer, err
 
 				gateway, err := grpcpkg.NewGateway(ctx, conn, params.Logger,
 					grpcpkg.WithServerMuxOptions(
-						runtime.WithErrorHandler(interceptors.HttpErrorHandler(params.Logger)),
+						runtime.WithErrorHandler(interceptors.HTTPErrorHandler(params.Logger)),
 						runtime.WithMetadata(interceptors.MetadataCookie()),
 						runtime.WithMetadata(interceptors.MetadataAuthorization()),
 						runtime.WithMetadata(interceptors.MetadataRequestPath()),
 					),
-					grpcpkg.WithHandlers(params.Register.HttpHandlers...),
+					grpcpkg.WithHandlers(params.Register.HTTPHandlers...),
 				)
 				if err != nil {
 					return err

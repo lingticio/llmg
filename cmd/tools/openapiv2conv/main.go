@@ -46,7 +46,7 @@ func main() {
 
 			openapiV3DocBuffer := new(bytes.Buffer)
 			encoder := yaml.NewEncoder(openapiV3DocBuffer)
-			encoder.SetIndent(2)
+			encoder.SetIndent(2) //nolint:mnd
 
 			err = encoder.Encode(openapiV3Doc)
 			if err != nil {
