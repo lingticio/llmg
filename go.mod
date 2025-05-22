@@ -2,37 +2,37 @@ module github.com/lingticio/llmg
 
 go 1.23.0
 
-toolchain go1.23.2
+toolchain go1.24.3
 
 require (
-	github.com/99designs/gqlgen v0.17.61
-	github.com/bufbuild/protovalidate-go v0.8.0
+	github.com/99designs/gqlgen v0.17.73
+	github.com/bufbuild/protovalidate-go v0.12.0
 	github.com/getkin/kin-openapi v0.128.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/websocket v1.5.3
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.25.1
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3
 	github.com/joho/godotenv v1.5.1
-	github.com/labstack/echo/v4 v4.13.3
+	github.com/labstack/echo/v4 v4.13.4
 	github.com/matoous/go-nanoid/v2 v2.1.0
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.11.2
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/nekomeowww/fo v1.4.0
-	github.com/nekomeowww/xo v1.14.0
+	github.com/nekomeowww/fo v1.6.0
+	github.com/nekomeowww/xo v1.16.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/redis/rueidis v1.0.51
-	github.com/redis/rueidis/om v1.0.51
+	github.com/redis/rueidis v1.0.60
+	github.com/redis/rueidis/om v1.0.60
 	github.com/rivo/uniseg v0.4.7
-	github.com/samber/lo v1.47.0
+	github.com/samber/lo v1.50.0
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
-	github.com/sashabaranov/go-openai v1.36.0
-	github.com/spf13/cobra v1.8.1
-	github.com/spf13/viper v1.19.0
+	github.com/sashabaranov/go-openai v1.40.0
+	github.com/spf13/cobra v1.9.1
+	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
-	github.com/vektah/gqlparser/v2 v2.5.20
-	go.uber.org/fx v1.23.0
+	github.com/vektah/gqlparser/v2 v2.5.27
+	go.uber.org/fx v1.24.0
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.69.2
-	google.golang.org/protobuf v1.36.0
+	google.golang.org/grpc v1.72.1
+	google.golang.org/protobuf v1.36.6
 	gopkg.in/yaml.v3 v3.0.1
 )
 
