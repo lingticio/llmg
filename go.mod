@@ -6,7 +6,7 @@ toolchain go1.23.2
 
 require (
 	github.com/99designs/gqlgen v0.17.61
-	github.com/bufbuild/protovalidate-go v0.8.0
+	github.com/bufbuild/protovalidate-go v1.2.0
 	github.com/getkin/kin-openapi v0.128.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/websocket v1.5.3
